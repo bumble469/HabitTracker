@@ -47,6 +47,16 @@ git --version
 
 That's it! 🎉 The app will automatically open in your default browser.
 
+## Optional AI predictions
+
+Core habit tracking and Insights calculations are local and work without a backend. AI is initially off. To connect the prediction service, create `.env.local` in the project root:
+
+```bash
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+Restart Vite after changing environment variables, then enable AI in the Settings tab. This public frontend variable must contain only the backend base URL; do not expose database credentials or model provider keys.
+
 ## Alternative Installation Methods
 
 ### Using GitHub CLI (if installed)
@@ -120,6 +130,9 @@ npm run preview
 
 # Run linting
 npm run lint
+
+# Run unit tests
+npm test
 ```
 
 ### System Requirements
