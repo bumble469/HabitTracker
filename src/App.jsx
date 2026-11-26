@@ -1,157 +1,419 @@
-import { useState } from 'react';
+import { lazy, Suspense, useRef, useState } from 'react';
+import {
+  CalendarDays,
+  ChartColumn,
+  ChartNoAxesCombined,
+  Check,
+  ChevronsUpDown,
+  Database,
+  LayoutDashboard,
+  ListChecks,
+  Menu,
+  Plus,
+  Settings,
+  ShieldCheck,
+} from 'lucide-react';
 import useLocalStorage from './hooks/useLocalStorage';
+import useLocalDate from './hooks/useLocalDate';
+import usePredictions from './hooks/usePredictions';
+import { setAiPreference } from './services/predictionApi';
 import AddHabitForm from './components/AddHabitForm';
 import HabitList from './components/HabitList';
 import ProgressBar from './components/ProgressBar';
 import CalendarView from './components/CalendarView';
-import StatisticsDashboard from './components/StatisticsDashboard';
 import DataExport from './components/DataExport';
+import SettingsPanel from './components/SettingsPanel';
+import WeeklyOverview from './components/WeeklyOverview';
+import Dialog from './components/Dialog';
+import { createDemoData } from './data/demoData';
+import { isEligibleDay, parseDateKey } from './utils/insights';
 
-function App() {
-  const [habits, setHabits] = useLocalStorage('habits', []);
-  const [completions, setCompletions] = useLocalStorage('completions', {});
-  const [activeTab, setActiveTab] = useState('habits');
+const StatisticsDashboard = lazy(
+  () => import('./components/StatisticsDashboard')
+);
+const InsightsDashboard = lazy(() => import('./components/InsightsDashboard'));
 
-  const today = new Date().toISOString().split('T')[0];
+const destinations = [
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'habits', label: 'Habits', icon: ListChecks },
+  { id: 'calendar', label: 'Calendar', icon: CalendarDays },
+  { id: 'statistics', label: 'Statistics', icon: ChartColumn },
+  { id: 'insights', label: 'Insights', icon: ChartNoAxesCombined },
+  { id: 'data', label: 'Data', icon: Database },
+  { id: 'settings', label: 'Settings', icon: Settings },
+];
 
-  const addHabit = (newHabit) => {
-    const habit = {
-      id: Date.now().toString(),
-      ...newHabit,
-      createdAt: new Date().toISOString(),
-      color: getRandomColor(),
-      icon: getRandomIcon(),
-    };
-    setHabits([...habits, habit]);
+export default function App() {
+  const [habits, setHabits, habitStorageError] = useLocalStorage('habits', []);
+  const [completions, setCompletions, completionStorageError] = useLocalStorage(
+    'completions',
+    {}
+  );
+  const [aiEnabled, setAiEnabled, preferenceError] = useLocalStorage(
+    'aiEnabled',
+    false
+  );
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [dataRevision, setDataRevision] = useState(0);
+  const [notice, setNotice] = useState('');
+  const headingRef = useRef(null);
+  const today = useLocalDate();
+  const predictions = usePredictions({
+    habits,
+    completions,
+    today,
+    enabled: aiEnabled,
+    active: ['dashboard', 'habits', 'insights'].includes(activeTab),
+    revision: dataRevision,
+  });
+  const destination = destinations.find((tab) => tab.id === activeTab);
+  const CurrentIcon = destination.icon;
+  const navigate = (id) => {
+    setActiveTab(id);
+    setMobileNavOpen(false);
+    setNotice('');
+    requestAnimationFrame(() => headingRef.current?.focus());
   };
-
-  const editHabit = (id, updatedHabit) => {
-    setHabits(habits.map(h => h.id === id ? { ...h, ...updatedHabit } : h));
+  const addHabit = (values) => {
+    setHabits((current) => [
+      ...current,
+      {
+        id: crypto.randomUUID(),
+        ...values,
+        createdAt: new Date().toISOString(),
+        color: 'bg-green-600',
+        icon: '○',
+      },
+    ]);
+    setAddOpen(false);
+    setNotice('Habit added.');
   };
-
+  const editHabit = (id, values) => {
+    setHabits((current) =>
+      current.map((habit) =>
+        habit.id === id ? { ...habit, ...values } : habit
+      )
+    );
+    setNotice('Habit updated.');
+  };
   const deleteHabit = (id) => {
-    setHabits(habits.filter(h => h.id !== id));
-    const newCompletions = { ...completions };
-    delete newCompletions[id];
-    setCompletions(newCompletions);
+    setHabits((current) => current.filter((habit) => habit.id !== id));
+    setCompletions((current) => {
+      const next = { ...current };
+      delete next[id];
+      return next;
+    });
+    setDataRevision((value) => value + 1);
+    setNotice('Habit deleted.');
+    headingRef.current?.focus();
   };
-
   const toggleComplete = (id) => {
-    const habitCompletions = completions[id] || [];
-    const isCompleted = habitCompletions.includes(today);
-    if (isCompleted) {
-      setCompletions({
-        ...completions,
-        [id]: habitCompletions.filter(date => date !== today),
-      });
-    } else {
-      setCompletions({
-        ...completions,
-        [id]: [...habitCompletions, today],
-      });
-    }
+    if (
+      !habits.some(
+        (habit) => habit.id === id && isEligibleDay(habit, today, today)
+      )
+    )
+      return;
+    setCompletions((current) => {
+      const history = current[id] || [];
+      return {
+        ...current,
+        [id]: history.includes(today)
+          ? history.filter((day) => day !== today)
+          : [...history, today],
+      };
+    });
   };
-
-  const completedToday = habits.filter(habit => (completions[habit.id] || []).includes(today)).length;
-
-  const getMotivationalMessage = () => {
-    const percentage = habits.length > 0 ? Math.round((completedToday / habits.length) * 100) : 0;
-    if (percentage === 100 && habits.length > 0) return "🎉 Amazing! All habits completed today!";
-    if (percentage >= 75) return "🚀 Great progress! Keep it up!";
-    if (percentage >= 50) return "💪 You're doing well! Stay consistent!";
-    if (percentage >= 25) return "🌟 Good start! Every step counts!";
-    return "🌱 Every journey begins with a single step!";
+  const replaceData = (nextHabits, nextCompletions) => {
+    setHabits(nextHabits);
+    setCompletions(nextCompletions);
+    setDataRevision((value) => value + 1);
   };
-
-  const tabs = [
-    { id: 'habits', label: 'Habits', icon: '🎯' },
-    { id: 'calendar', label: 'Calendar', icon: '📅' },
-    { id: 'statistics', label: 'Statistics', icon: '📊' },
-    { id: 'data', label: 'Data', icon: '💾' },
-  ];
+  const loadDemoData = () => {
+    const data = createDemoData(today);
+    replaceData(data.habits, data.completions);
+  };
+  const toggleAi = (value) => {
+    const saved = setAiPreference(value);
+    setAiEnabled(saved ? value : false);
+    if (!saved)
+      setNotice('AI is off because the preference could not be saved.');
+  };
+  const due = habits.filter((habit) => isEligibleDay(habit, today, today));
+  const completed = due.filter((habit) =>
+    (completions[habit.id] || []).includes(today)
+  ).length;
+  const listProps = {
+    habits,
+    completions,
+    predictions: predictions.results,
+    aiEnabled,
+    today,
+    onToggleComplete: toggleComplete,
+    onEditHabit: editHabit,
+    onDeleteHabit: deleteHabit,
+    onAddHabit: () => setAddOpen(true),
+  };
+  const navigation = (
+    <nav aria-label="Main navigation">
+      {destinations.map((tab) => {
+        const { id, label } = tab;
+        const Icon = tab.icon;
+        return (
+          <button
+            key={id}
+            type="button"
+            className={`nav-item ${id === activeTab ? 'active' : ''} ${id === 'settings' ? 'nav-settings' : ''}`}
+            aria-current={id === activeTab ? 'page' : undefined}
+            onClick={() => navigate(id)}
+          >
+            <Icon size={19} strokeWidth={1.8} aria-hidden="true" />
+            <span>{label}</span>
+          </button>
+        );
+      })}
+    </nav>
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
-        <div className="text-center mb-8 animate-fade-in-up">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            🌟 Habit Tracker
-          </h1>
-          <p className="text-gray-600 text-lg">{getMotivationalMessage()}</p>
+    <div className="app-shell">
+      <a className="skip-link" href="#main-content">
+        Skip to content
+      </a>
+      <aside className="sidebar">
+        <a
+          className="brand"
+          href="#main-content"
+          onClick={() => navigate('dashboard')}
+        >
+          <span className="brand-mark">
+            <Check size={23} strokeWidth={2.5} aria-hidden="true" />
+          </span>
+          <span>
+            Habit Tracker
+            <span className="brand-caption">Behaviour Insights & AI Coach</span>
+          </span>
+        </a>
+        {navigation}
+        <div className="sidebar-footer">
+          <ShieldCheck size={16} aria-hidden="true" />
+          <span>Stored in your browser</span>
         </div>
-
-        {/* Navigation Tabs */}
-        <div className="mb-6 bg-white rounded-xl shadow-lg p-2 border border-gray-100">
-          <div className="flex space-x-1">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md transform scale-105'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <span className="mr-2">{tab.icon}</span>
-                {tab.label}
-              </button>
-            ))}
+      </aside>
+      <div className="app-workspace">
+        <header className="topbar">
+          <div className="topbar-location">
+            <button
+              type="button"
+              className="icon-button mobile-menu"
+              aria-label="Open navigation"
+              aria-expanded={mobileNavOpen}
+              onClick={() => setMobileNavOpen(true)}
+            >
+              <Menu size={22} aria-hidden="true" />
+            </button>
+            <CurrentIcon size={17} aria-hidden="true" />
+            <span>{destination.label}</span>
           </div>
-        </div>
-
-        {/* Tab Content */}
-        <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-          {activeTab === 'habits' && (
+          <button
+            type="button"
+            className="privacy-link"
+            onClick={() => navigate('settings')}
+          >
+            <ShieldCheck size={15} aria-hidden="true" />
+            <span>AI {aiEnabled ? 'enabled' : 'off'}</span>
+            <ChevronsUpDown size={13} aria-hidden="true" />
+          </button>
+        </header>
+        <main id="main-content" className="main-content">
+          <div className="page-heading">
+            <div>
+              <h1 ref={headingRef} tabIndex={-1}>
+                {activeTab === 'dashboard'
+                  ? 'Today'
+                  : activeTab === 'habits'
+                    ? 'Your habits'
+                    : destination.label}
+              </h1>
+              <p className="muted">
+                {activeTab === 'dashboard'
+                  ? parseDateKey(today).toLocaleDateString(undefined, {
+                      weekday: 'long',
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })
+                  : activeTab === 'habits'
+                    ? 'Simple routines, with a clear record of your progress.'
+                    : activeTab === 'calendar'
+                      ? 'A day-by-day view of your check-ins.'
+                      : activeTab === 'statistics'
+                        ? 'Your progress, measured from local history.'
+                        : activeTab === 'insights'
+                          ? 'Understand consistency and changes in your routines.'
+                          : activeTab === 'settings'
+                            ? 'Manage AI sharing and your local data.'
+                            : 'Keep a backup of your habits and completion history.'}
+              </p>
+            </div>
+            {['dashboard', 'habits'].includes(activeTab) && (
+              <button
+                className="btn btn-primary"
+                onClick={() => setAddOpen(true)}
+              >
+                <Plus size={18} aria-hidden="true" />
+                Add habit
+              </button>
+            )}
+          </div>
+          {(habitStorageError || completionStorageError || preferenceError) && (
+            <p role="alert" className="status-note status-error">
+              {habitStorageError || completionStorageError || preferenceError}
+            </p>
+          )}
+          <div className="sr-only" role="status" aria-live="polite">
+            {notice}
+          </div>
+          {['dashboard', 'habits'].includes(activeTab) &&
+            aiEnabled &&
+            habits.length > 0 && (
+              <div className="status-note prediction-notice" role="status">
+                <span>
+                  {predictions.loading
+                    ? 'Loading predictions for tomorrow. You can keep checking in.'
+                    : predictions.error
+                      ? `${predictions.error} Local tracking and charts are available.`
+                      : 'Predictions for tomorrow are up to date.'}
+                </span>
+                <button
+                  type="button"
+                  className="text-button"
+                  onClick={predictions.retry}
+                  disabled={predictions.loading}
+                >
+                  {predictions.loading
+                    ? 'Loading predictions…'
+                    : predictions.error
+                      ? 'Retry predictions'
+                      : 'Refresh predictions'}
+                </button>
+              </div>
+            )}
+          {activeTab === 'dashboard' && (
             <>
-              <AddHabitForm onAddHabit={addHabit} />
-              <ProgressBar completed={completedToday} total={habits.length} />
-              <HabitList
-                habits={habits}
-                completions={completions}
-                onToggleComplete={toggleComplete}
-                onEditHabit={editHabit}
-                onDeleteHabit={deleteHabit}
-              />
+              <ProgressBar completed={completed} total={due.length} />
+              <div className="dashboard-grid">
+                <HabitList {...listProps} />
+                <WeeklyOverview
+                  habits={habits}
+                  completions={completions}
+                  today={today}
+                  onOpenInsights={() => navigate('insights')}
+                  onOpenSettings={() => navigate('settings')}
+                  aiEnabled={aiEnabled}
+                />
+              </div>
             </>
           )}
-
+          {activeTab === 'habits' && <HabitList {...listProps} management />}
           {activeTab === 'calendar' && (
-            <CalendarView completions={completions} habits={habits} />
+            <CalendarView
+              habits={habits}
+              completions={completions}
+              today={today}
+            />
           )}
-
           {activeTab === 'statistics' && (
-            <StatisticsDashboard habits={habits} completions={completions} />
+            <Suspense fallback={<ReportSkeleton statistics />}>
+              <StatisticsDashboard
+                habits={habits}
+                completions={completions}
+                today={today}
+              />
+            </Suspense>
           )}
-
+          {activeTab === 'insights' && (
+            <Suspense fallback={<ReportSkeleton />}>
+              <InsightsDashboard
+                habits={habits}
+                completions={completions}
+                today={today}
+                predictions={predictions.results}
+                aiEnabled={aiEnabled}
+                predictionLoading={predictions.loading}
+                predictionError={predictions.error}
+                onRetryPredictions={predictions.retry}
+              />
+            </Suspense>
+          )}
           {activeTab === 'data' && (
-            <DataExport habits={habits} completions={completions} />
+            <DataExport
+              habits={habits}
+              completions={completions}
+              onImport={replaceData}
+              onClear={() => replaceData([], {})}
+            />
           )}
-        </div>
-
-        {habits.length === 0 && activeTab === 'habits' && (
-          <div className="text-center mt-12 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-            <div className="text-6xl mb-4 animate-pulse-gentle">🎯</div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">Ready to build better habits?</h3>
-            <p className="text-gray-500">Start by adding your first habit above!</p>
-          </div>
-        )}
+          {activeTab === 'settings' && (
+            <SettingsPanel
+              aiEnabled={aiEnabled}
+              onAiToggle={toggleAi}
+              onLoadDemo={loadDemoData}
+              habits={habits}
+              completions={completions}
+              onImport={replaceData}
+              onClear={() => replaceData([], {})}
+              today={today}
+            />
+          )}
+          <footer className="content-footer">
+            <span>Habit Tracker</span>
+            <span>Behaviour Insights & AI Coach</span>
+          </footer>
+        </main>
       </div>
+      <Dialog
+        open={mobileNavOpen}
+        onClose={() => setMobileNavOpen(false)}
+        title="Habit Tracker"
+        className="navigation-dialog"
+      >
+        {navigation}
+        <p className="drawer-note">
+          <ShieldCheck size={16} aria-hidden="true" />
+          Stored in your browser
+        </p>
+      </Dialog>
+      <Dialog
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        title="Add habit"
+        description="Choose a routine you want to track each day."
+      >
+        <AddHabitForm
+          onAddHabit={addHabit}
+          onCancel={() => setAddOpen(false)}
+        />
+      </Dialog>
     </div>
   );
 }
 
-function getRandomColor() {
-  const colors = [
-    'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500',
-    'bg-indigo-500', 'bg-red-500', 'bg-yellow-500', 'bg-teal-500'
-  ];
-  return colors[Math.floor(Math.random() * colors.length)];
+function ReportSkeleton({ statistics = false }) {
+  return (
+    <div
+      className={`report-skeleton ${statistics ? 'statistics-skeleton' : ''}`}
+      role="status"
+      aria-label="Loading local report"
+    >
+      <div className="skeleton-heading" />
+      <div className="skeleton-chart-row">
+        <div className="panel skeleton-chart" />
+        {!statistics && <div className="panel skeleton-chart" />}
+      </div>
+      <span className="sr-only">Loading local report…</span>
+    </div>
+  );
 }
-
-function getRandomIcon() {
-  const icons = ['💧', '🏃', '📚', '🎵', '🍎', '🧘', '💻', '🎨', '🏋️', '🛏️'];
-  return icons[Math.floor(Math.random() * icons.length)];
-}
-
-export default App;

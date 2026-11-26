@@ -1,0 +1,429 @@
+/* Shared layout for the calendar, statistics, and teammate-owned settings surfaces. */
+.settings-panel {
+  padding: 0;
+}
+.settings-section {
+  padding: 28px 32px;
+}
+.settings-section + .settings-section {
+  border-top: 1px solid var(--border, #dfe5e0);
+}
+.section-copy {
+  max-width: 760px;
+  margin-bottom: 20px;
+}
+.section-copy .section-title {
+  margin-bottom: 8px;
+}
+.section-copy p {
+  margin: 4px 0 0;
+}
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 20px 0;
+}
+.settings-row + .settings-row {
+  border-top: 1px solid var(--border, #dfe5e0);
+}
+.settings-row h3 {
+  margin: 0 0 5px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+.settings-row p {
+  margin: 0;
+  max-width: 620px;
+}
+.settings-row .btn {
+  flex-shrink: 0;
+}
+.ai-setting {
+  cursor: pointer;
+  padding-top: 8px;
+}
+.settings-switch {
+  appearance: none;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 26px;
+  border: 1px solid #7e8d83;
+  border-radius: 20px;
+  background: #e0e5e1;
+  position: relative;
+  cursor: pointer;
+  transition: background 150ms;
+  margin: 9px 0;
+}
+.settings-switch::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: 3px;
+  left: 3px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid #87938c;
+  transition: transform 150ms;
+}
+.settings-switch:checked {
+  background: #285a46;
+  border-color: #285a46;
+}
+.settings-switch:checked::after {
+  transform: translateX(18px);
+  border-color: white;
+}
+.privacy-note {
+  padding: 16px 20px;
+  border-left: 3px solid var(--primary, #285a46);
+  background: var(--primary-soft, #eaf2ed);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.875rem;
+}
+.privacy-note p {
+  margin: 8px 0 0;
+  color: var(--muted, #5f6b64);
+  line-height: 1.6;
+}
+.data-panel {
+  padding: 28px 32px;
+}
+.status-error {
+  color: #9c342d;
+  background: #fbeeea;
+}
+.calendar-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(260px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.calendar-panel,
+.calendar-details {
+  padding: 24px;
+  min-width: 0;
+}
+.calendar-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.calendar-nav-btn {
+  width: 44px;
+  padding: 0;
+  justify-content: center;
+}
+.calendar-grid {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+.calendar-grid th {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 0 0 16px;
+  color: var(--muted, #5f6b64);
+  text-align: center;
+}
+.calendar-grid td {
+  padding: 4px 0;
+  text-align: center;
+}
+.calendar-day {
+  min-height: 52px;
+  height: 100%;
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9375rem;
+  background: transparent;
+  cursor: pointer;
+}
+.calendar-day:hover {
+  background: #eff3ef;
+}
+.calendar-day[aria-current='date'] {
+  font-weight: 700;
+  color: var(--primary, #285a46);
+  border-color: var(--primary, #285a46);
+}
+.calendar-day[aria-pressed='true'] {
+  color: white;
+  background: var(--primary, #285a46);
+  border-color: var(--primary, #285a46);
+}
+.calendar-day[aria-pressed='true'] .calendar-mark {
+  box-shadow: 0 0 0 1px white;
+}
+.calendar-day:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.calendar-mark,
+.calendar-legend i {
+  width: 6px;
+  height: 6px;
+  display: inline-block;
+  border-radius: 50%;
+}
+.calendar-mark-complete {
+  background: #285a46;
+}
+.calendar-mark-partial {
+  background: #9a6b21;
+}
+.calendar-mark-none {
+  background: #9ca79f;
+}
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 24px;
+  margin-top: 8px;
+  border-top: 1px solid var(--border, #dfe5e0);
+  color: var(--muted, #5f6b64);
+  font-size: 0.8125rem;
+}
+.calendar-legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.calendar-footnote {
+  font-size: 0.8125rem;
+  margin-top: 16px;
+}
+.calendar-habit-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.calendar-habit-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  border-top: 1px solid var(--border, #dfe5e0);
+  overflow-wrap: anywhere;
+}
+.completion-dot {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  background: #f1f3f0;
+  border: 1px solid var(--border, #dfe5e0);
+  border-radius: 50%;
+  color: #5f6b64;
+}
+.completion-dot.is-complete {
+  color: #285a46;
+  background: #eaf2ed;
+}
+.statistics-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 24px 0;
+}
+.statistics-metrics > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 24px;
+}
+.statistics-metrics > div + div {
+  border-left: 1px solid var(--border, #dfe5e0);
+}
+.statistics-metrics strong {
+  font-size: 1.875rem;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.statistics-metrics strong small {
+  font-size: 0.875rem;
+  letter-spacing: 0;
+  color: var(--muted, #5f6b64);
+  font-weight: 400;
+}
+.statistics-metrics > div > small {
+  font-size: 0.8125rem;
+}
+.statistics-chart-panel,
+.statistics-best {
+  padding: 24px;
+}
+.statistics-chart {
+  width: 100%;
+  min-width: 0;
+  height: 280px;
+}
+.chart-data-details {
+  margin-top: 16px;
+  font-size: 0.875rem;
+}
+.chart-data-details summary {
+  color: var(--primary, #285a46);
+  cursor: pointer;
+  padding: 10px 0;
+  min-height: 44px;
+}
+.table-scroll {
+  overflow-x: auto;
+}
+.data-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.875rem;
+}
+.data-table th,
+.data-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border, #dfe5e0);
+  text-align: left;
+}
+.data-table th {
+  font-weight: 500;
+}
+.data-table thead {
+  color: var(--muted, #5f6b64);
+}
+.top-habits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.top-habits-list li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-top: 1px solid var(--border, #dfe5e0);
+  padding: 20px 0;
+}
+.top-habits-list li > div {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.top-habits-list h3 {
+  font-size: 1rem;
+  margin: 0 0 4px;
+  font-weight: 500;
+}
+.top-habits-list p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+.top-habits-list strong {
+  font-size: 1.125rem;
+  font-variant-numeric: tabular-nums;
+}
+.habit-rank {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background: var(--primary-soft, #eaf2ed);
+  color: var(--primary, #285a46);
+  font-size: 0.875rem;
+}
+@media (max-width: 1023px) {
+  .calendar-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .statistics-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 24px;
+  }
+  .statistics-metrics > div:nth-child(3) {
+    border-left: 0;
+  }
+}
+@media (max-width: 599px) {
+  .settings-section,
+  .data-panel {
+    padding: 24px 20px;
+  }
+  .settings-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .ai-setting {
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+  }
+  .settings-row .btn {
+    width: 100%;
+  }
+  .calendar-panel {
+    padding: 20px 12px;
+  }
+  .calendar-details {
+    padding: 20px;
+  }
+  .calendar-heading {
+    padding: 0 4px;
+  }
+  .calendar-day {
+    min-height: 44px;
+  }
+  .calendar-legend {
+    gap: 12px;
+  }
+  .calendar-legend span {
+    font-size: 0.75rem;
+  }
+  .statistics-metrics > div {
+    padding: 0 16px;
+  }
+  .statistics-metrics > div > span {
+    font-size: 0.8125rem;
+  }
+  .statistics-metrics strong {
+    font-size: 1.625rem;
+  }
+  .statistics-chart-panel,
+  .statistics-best {
+    padding: 20px 12px;
+  }
+  .statistics-chart-panel .section-copy,
+  .statistics-best .section-copy {
+    padding: 0 8px;
+  }
+  .top-habits-list li {
+    gap: 12px;
+  }
+  .privacy-note {
+    padding: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .settings-switch,
+  .settings-switch::after {
+    transition: none;
+  }
+}
