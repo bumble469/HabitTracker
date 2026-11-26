@@ -1,99 +1,167 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import {
+  Check,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  Flame,
+  Award,
+} from 'lucide-react';
+import RiskBadge from './RiskBadge';
+import Dialog from './Dialog';
+import AddHabitForm from './AddHabitForm';
 
-function HabitItem({ habit, isCompletedToday, streak, onToggleComplete, onEdit, onDelete }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editName, setEditName] = useState(habit.name);
-  const [editDescription, setEditDescription] = useState(habit.description);
-
-  const handleEditSubmit = (e) => {
-    e.preventDefault();
-    onEdit(habit.id, { name: editName.trim(), description: editDescription.trim() });
-    setIsEditing(false);
-  };
-
-  const handleEditCancel = () => {
-    setEditName(habit.name);
-    setEditDescription(habit.description);
-    setIsEditing(false);
-  };
-
-  return (
-    <div className={`p-6 bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 mb-4 ${isCompletedToday ? 'ring-2 ring-green-300 animate-celebrate' : ''}`}>
-      {isEditing ? (
-        <form onSubmit={handleEditSubmit}>
-          <input
-            type="text"
-            value={editName}
-            onChange={(e) => setEditName(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <input
-            type="text"
-            value={editDescription}
-            onChange={(e) => setEditDescription(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Description"
-          />
-          <div className="flex space-x-3">
-            <button type="submit" className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200">
-              ✓ Save
-            </button>
-            <button type="button" onClick={handleEditCancel} className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200">
-              ✕ Cancel
-            </button>
-          </div>
-        </form>
-      ) : (
-        <>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center flex-1">
-              <button
-                onClick={() => onToggleComplete(habit.id)}
-                className={`w-12 h-12 rounded-full border-2 border-gray-300 flex items-center justify-center text-2xl transition-all duration-300 mr-4 ${
-                  isCompletedToday
-                    ? 'bg-green-500 border-green-500 text-white transform scale-110'
-                    : 'hover:border-blue-400 hover:scale-105'
-                }`}
-              >
-                {isCompletedToday ? '✓' : habit.icon || '○'}
-              </button>
-              <div className="flex-1">
-                <h3 className={`text-lg font-semibold ${isCompletedToday ? 'line-through text-gray-500' : 'text-gray-800'}`}>
-                  {habit.name}
-                </h3>
-                {habit.description && (
-                  <p className={`text-sm ${isCompletedToday ? 'text-gray-400' : 'text-gray-600'}`}>
-                    {habit.description}
-                  </p>
-                )}
-                <div className="flex items-center mt-2">
-                  <span className="text-sm text-gray-500 mr-2">🔥</span>
-                  <span className="text-sm font-medium text-orange-600">{streak} day streak</span>
-                  {streak >= 7 && <span className="ml-2 text-yellow-500">⭐</span>}
-                  {streak >= 30 && <span className="ml-1 text-purple-500">👑</span>}
-                </div>
-              </div>
-            </div>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => setIsEditing(true)}
-                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-3 rounded-lg transition-colors duration-200 text-sm"
-              >
-                ✏️ Edit
-              </button>
-              <button
-                onClick={() => onDelete(habit.id)}
-                className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-3 rounded-lg transition-colors duration-200 text-sm"
-              >
-                🗑️ Delete
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-    </div>
-  );
+function scheduleLabel(habit) {
+  const days = habit.scheduledDays || habit.days;
+  if (!Array.isArray(days) || days.length === 7 || !days.length)
+    return 'Every day';
+  return days
+    .map((day) => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][day])
+    .filter(Boolean)
+    .join(', ');
 }
 
-export default HabitItem;
+export default function HabitItem({
+  habit,
+  isCompletedToday,
+  streak,
+  prediction,
+  aiEnabled,
+  eligible = true,
+  onToggleComplete,
+  onEdit,
+  onDelete,
+}) {
+  const [dialog, setDialog] = useState(null);
+  const menuRef = useRef(null);
+  useEffect(() => {
+    const close = (event) => {
+      if (!menuRef.current?.contains(event.target))
+        menuRef.current?.removeAttribute('open');
+    };
+    document.addEventListener('pointerdown', close);
+    return () => document.removeEventListener('pointerdown', close);
+  }, []);
+  const openDialog = (type) => {
+    menuRef.current?.removeAttribute('open');
+    menuRef.current?.querySelector('summary')?.focus();
+    setDialog(type);
+  };
+  return (
+    <li className={`habit-row ${isCompletedToday ? 'is-complete' : ''}`}>
+      <button
+        type="button"
+        className="habit-check"
+        disabled={!eligible}
+        onClick={() => onToggleComplete(habit.id)}
+        aria-pressed={isCompletedToday}
+        aria-label={`${isCompletedToday ? 'Mark incomplete' : 'Complete'}: ${habit.name}`}
+      >
+        {isCompletedToday && (
+          <Check size={23} strokeWidth={2.5} aria-hidden="true" />
+        )}
+      </button>
+      <div className="habit-content">
+        <h3>{habit.name}</h3>
+        {habit.description && (
+          <p className="habit-description">{habit.description}</p>
+        )}
+        <div className="habit-meta">
+          <span>{eligible ? scheduleLabel(habit) : 'Not due today'}</span>
+          {habit.source === 'demo' && (
+            <span className="synthetic-label">Synthetic</span>
+          )}
+          {habit.category && <span>{habit.category}</span>}
+          <span className="streak">
+            <Flame size={14} aria-hidden="true" />
+            {streak} day streak
+          </span>
+          {streak >= 7 && (
+            <span className="achievement">
+              <Award size={14} aria-hidden="true" />
+              {streak >= 30 ? '30-day badge' : '7-day badge'}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="habit-prediction">
+        <RiskBadge prediction={prediction} aiEnabled={aiEnabled} />
+      </div>
+      <details
+        className="actions-menu"
+        ref={menuRef}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') {
+            event.currentTarget.removeAttribute('open');
+            event.currentTarget.querySelector('summary')?.focus();
+          }
+        }}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget))
+            event.currentTarget.removeAttribute('open');
+        }}
+      >
+        <summary
+          className="icon-button"
+          aria-label={`Actions for ${habit.name}`}
+        >
+          <MoreHorizontal size={20} aria-hidden="true" />
+        </summary>
+        <div className="actions-popover">
+          <button type="button" onClick={() => openDialog('edit')}>
+            <Pencil size={16} aria-hidden="true" />
+            Edit habit
+          </button>
+          <button
+            type="button"
+            className="danger-text"
+            onClick={() => openDialog('delete')}
+          >
+            <Trash2 size={16} aria-hidden="true" />
+            Delete habit
+          </button>
+        </div>
+      </details>
+      <Dialog
+        open={dialog === 'edit'}
+        onClose={() => setDialog(null)}
+        title="Edit habit"
+        description="Update the name and description. Your check-in history is preserved."
+      >
+        <AddHabitForm
+          initialHabit={habit}
+          submitLabel="Save changes"
+          onCancel={() => setDialog(null)}
+          onAddHabit={(values) => {
+            onEdit(habit.id, values);
+            setDialog(null);
+          }}
+        />
+      </Dialog>
+      <Dialog
+        open={dialog === 'delete'}
+        onClose={() => setDialog(null)}
+        title="Delete habit?"
+        description={`“${habit.name}” and its entire check-in history will be removed. Export a backup from Settings if you want to keep them.`}
+      >
+        <div className="dialog-actions">
+          <button
+            type="button"
+            className="btn btn-secondary"
+            data-autofocus
+            onClick={() => setDialog(null)}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="btn btn-danger"
+            onClick={() => onDelete(habit.id)}
+          >
+            Delete habit
+          </button>
+        </div>
+      </Dialog>
+    </li>
+  );
+}
