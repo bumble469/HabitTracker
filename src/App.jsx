@@ -10,12 +10,13 @@ import {
   LogOut,
   Menu,
   Plus,
+  RefreshCw,
   Settings,
   ShieldCheck,
   Sprout,
 } from 'lucide-react';
 import useLocalDate from './hooks/useLocalDate';
-import usePredictions from './hooks/usePredictions';
+import usePredictions, { clearPredictionCache } from './hooks/usePredictions';
 import {
   clearAuthSession,
   getCurrentUser,
@@ -139,6 +140,7 @@ function AccountApp({ testingRoute }) {
       }
       onLogout={() => {
         clearAuthSession();
+        clearPredictionCache();
         setSession(null);
         replacePage(HOME_URL);
       }}
@@ -442,13 +444,34 @@ function HabitTrackerApp({ session, testingRoute, onSessionUpdated, onLogout }) 
               </p>
             </div>
             {['dashboard', 'habits'].includes(activeTab) && (
-              <button
-                className="btn btn-primary"
-                onClick={() => setAddOpen(true)}
-              >
-                <Plus size={18} aria-hidden="true" />
-                Add habit
-              </button>
+              <div className="page-actions">
+                {aiEnabled && habits.length > 0 && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={predictions.retry}
+                    disabled={predictions.loading}
+                  >
+                    <RefreshCw
+                      size={16}
+                      className={predictions.loading ? 'spin-icon' : undefined}
+                      aria-hidden="true"
+                    />
+                    {predictions.loading
+                      ? 'Loading predictions…'
+                      : predictions.error
+                        ? 'Retry predictions'
+                        : 'Refresh predictions'}
+                  </button>
+                )}
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setAddOpen(true)}
+                >
+                  <Plus size={18} aria-hidden="true" />
+                  Add habit
+                </button>
+              </div>
             )}
           </div>
           {dataError && (
@@ -478,18 +501,6 @@ function HabitTrackerApp({ session, testingRoute, onSessionUpdated, onLogout }) 
                       ? predictions.error
                       : 'Risk estimates are up to date.'}
                 </span>
-                <button
-                  type="button"
-                  className="text-button"
-                  onClick={predictions.retry}
-                  disabled={predictions.loading}
-                >
-                  {predictions.loading
-                    ? 'Loading predictions…'
-                    : predictions.error
-                      ? 'Retry predictions'
-                      : 'Refresh predictions'}
-                </button>
               </div>
             )}
           {activeTab === 'dashboard' && (

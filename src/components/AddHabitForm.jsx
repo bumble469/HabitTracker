@@ -122,7 +122,7 @@ export default function AddHabitForm({
         <label className="settings-row ai-setting" htmlFor={`${id}-reminder-on`}>
           <span>
             <span className="field-label">Reminder</span>
-            <span className="muted">Receive a push notification for this habit</span>
+            <span className="form-hint">Receive a push notification for this habit</span>
           </span>
           <input
             id={`${id}-reminder-on`}

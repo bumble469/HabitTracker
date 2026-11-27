@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { fileURLToPath } from 'node:url'
 
-const base = '/Habit-Tracker-Web-App/'
+const base = process.env.VERCEL ? '/' : '/Habit-Tracker-Web-App/'
 
 // Keep direct app/tool URLs working on static hosts, including GitHub Pages.
 function applicationEntries() {
