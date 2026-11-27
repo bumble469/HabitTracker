@@ -1,0 +1,73 @@
+{
+  "tool_mode": "built-in image_gen",
+  "purpose": "Production art assets for the approved Habit Tracker landing page",
+  "image_treatment": "Flat hand-drawn sage and olive illustrations, dark olive outlines, subtle paper grain, no embedded text or website UI",
+  "conversion": {
+    "tool": "Pillow",
+    "format": "WebP",
+    "quality": 88,
+    "method": 6,
+    "resizing": false
+  },
+  "hero": {
+    "output": "public/landing/hero-landscape.webp",
+    "original": "/home/pratikvr/.codex/generated_images/01a21946-67d1-7663-98dd-16aef471e877/exec-07ed3681-cb35-4190-98b2-6b44576527ff.png",
+    "native_dimensions": [
+      1340,
+      1174
+    ],
+    "bytes": 97554,
+    "prompt": "Use case: precise-object-edit\nAsset type: production hero background illustration only for Habit Tracker website.\nInput image is the approved website mockup. Extract and complete its ARTWORK as one seamless full-bleed, high-resolution 2048x1792 raster illustration. Preserve the exact flat hand-drawn sage-and-olive botanical world, subtle paper grain, quiet optimistic mood, simple dark olive outlines, organic leaf shapes, framing plants, landscape and stretching woman. It is ART ONLY.\nREMOVE every word, letter, label, headline, button, check-in panel, shield, logo, announcement strip, navigation and any website UI. No text whatsoever. Fill areas where UI was removed with uniformly pale cream-sage #F1F3E6, not shapes suggesting UI. Remove the outer rounded frame and page margin; artwork reaches every edge of the bitmap.\nComposition: very pale empty center from x=20% to80% and top to80% height, reserved for HTML copy and an HTML demo card. This central quiet region must not have decorative objects, leaves, grids, frames, writing or high-contrast lines. Keep all main scenery near side edges and bottom: large leafy branches in farleft and farright edges/topcorners; book and steaming morning cup bottomleft; stretching relaxed woman lowerright; curving cream walking path and gentle green hills across bottom; small hanging calendar with blank grid and a couple simple checkmarks on far right lowerhalf. Keep woman out of central safearea: body and head to right of85% width. Do not add extra people or bright hues.\nPalette: #F1F3E6 pale sage-cream ground, tonal sage and olive foliage, #3F6212 deepgreen detail, soft greens. Texture only in illustration, restrained subtle fine paper grain. No photography, no 3D, no shadows on interface because no interface exists. No watermarks. Please generate at least2048 pixels wide, with complete coherent artwork and generous empty upper/central field.",
+    "inspection": "Reviewed generated art: text and UI removed; central quiet pale field, leafy side edges, book and cup lower left, woman lower right, calendar at right."
+  },
+  "projects": [
+    {
+      "name": "morning",
+      "output": "public/landing/project-morning.webp",
+      "original": "/home/pratikvr/.codex/generated_images/01a21946-67d1-7663-98dd-16aef471e877/exec-150850b1-2814-4658-ac43-6024ca34c4ae.png",
+      "native_dimensions": [
+        1448,
+        1086
+      ],
+      "bytes": 221382,
+      "prompt": "Use case: illustration-story. Asset type: production landscape editorial illustration for a Habit Tracker example habit project card, artwork ONLY. Use supplied reference for exact art direction: flat hand-drawn sage-and-olive scene, simple dark olive outlines, organic leaves, a gentle paper grain texture, calm optimistic everyday ritual. Green tonal palette only, pale cream #F1F3E6 and sage #E9EADE, deep olive #3F6212, subtle warm ivory. No other bright hues, no photography, no 3D, no watermarks. High quality composition at a natural 4:3 landscape ratio, target 1024 by768 pixels. Fill every edge; no frame or outer whitespace, no text, letters, numbers, logo, UI, interface cards, buttons, collage or diagram. It will be framed in an8px-rounded webpage image; do not bake rounded corners.\nScene: a slower morning. A large steaming cup on a tidy light sage tabletop near an open kitchen window, leafy potted plant catching morning light, small oatmeal bowl and wooden spoon. A view of soft rounded hills outside. Objects have deliberate relationships, not clutter. Cup and plant are the focal points, comforting gently textured illustration.",
+      "inspection": "Reviewed final image; subject is complete, no text or UI, style and palette consistent with hero reference."
+    },
+    {
+      "name": "movement",
+      "output": "public/landing/project-movement.webp",
+      "original": "/home/pratikvr/.codex/generated_images/01a21946-67d1-7663-98dd-16aef471e877/exec-f0acaa18-7f89-4df2-84a8-7a2b31a3e1ae.png",
+      "native_dimensions": [
+        1448,
+        1086
+      ],
+      "bytes": 168236,
+      "prompt": "Use case: illustration-story. Asset type: production landscape editorial illustration for a Habit Tracker example habit project card, artwork ONLY. Use supplied reference for exact art direction: flat hand-drawn sage-and-olive scene, simple dark olive outlines, organic leaves, a gentle paper grain texture, calm optimistic everyday ritual. Green tonal palette only, pale cream #F1F3E6 and sage #E9EADE, deep olive #3F6212, subtle warm ivory. No other bright hues, no photography, no 3D, no watermarks. High quality composition at a natural 4:3 landscape ratio, target 1024 by768 pixels. Fill every edge; no frame or outer whitespace, no text, letters, numbers, logo, UI, interface cards, buttons, collage or diagram. It will be framed in an8px-rounded webpage image; do not bake rounded corners.\nScene: a little daily movement. One relaxed person walking at an easy pace along a cream path through gently rolling sage hills and leafy trees. Comfortable green trousers and light sage top, warm human skin. A few tiny wildflowers rendered in cream/green. Person central-left, path winds diagonally into the quiet landscape. No sports metrics or signs. Framed composition feels spacious and inviting.",
+      "inspection": "Reviewed final image; subject is complete, no text or UI, style and palette consistent with hero reference."
+    },
+    {
+      "name": "reading",
+      "output": "public/landing/project-reading.webp",
+      "original": "/home/pratikvr/.codex/generated_images/01a21946-67d1-7663-98dd-16aef471e877/exec-2c41b009-1269-4eec-a947-228b7bb29029.png",
+      "native_dimensions": [
+        1448,
+        1086
+      ],
+      "bytes": 180418,
+      "prompt": "Use case: illustration-story. Asset type: production landscape editorial illustration for a Habit Tracker example habit project card, artwork ONLY. Use supplied reference for exact art direction: flat hand-drawn sage-and-olive scene, simple dark olive outlines, organic leaves, a gentle paper grain texture, calm optimistic everyday ritual. Green tonal palette only, pale cream #F1F3E6 and sage #E9EADE, deep olive #3F6212, subtle warm ivory. No other bright hues, no photography, no 3D, no watermarks. High quality composition at a natural 4:3 landscape ratio, target 1024 by768 pixels. Fill every edge; no frame or outer whitespace, no text, letters, numbers, logo, UI, interface cards, buttons, collage or diagram. It will be framed in an8px-rounded webpage image; do not bake rounded corners.\nScene: one more chapter. An inviting large open book rests on a light sage wooden reading desk beside a sunlit window with a potted trailing vine. A soft green chair and stack of2closed books. Pages contain only faint abstract line marks, never legible letters or words. Book large and central, plants around edges, gentle cream light across pages.",
+      "inspection": "Reviewed final image; subject is complete, no text or UI, style and palette consistent with hero reference."
+    },
+    {
+      "name": "evening",
+      "output": "public/landing/project-evening.webp",
+      "original": "/home/pratikvr/.codex/generated_images/01a21946-67d1-7663-98dd-16aef471e877/exec-8b592a2b-3a4f-4524-bf36-25e1ad6408e0.png",
+      "native_dimensions": [
+        1448,
+        1086
+      ],
+      "bytes": 178156,
+      "prompt": "Use case: illustration-story. Asset type: production landscape editorial illustration for a Habit Tracker example habit project card, artwork ONLY. Use supplied reference for exact art direction: flat hand-drawn sage-and-olive scene, simple dark olive outlines, organic leaves, a gentle paper grain texture, calm optimistic everyday ritual. Green tonal palette only, pale cream #F1F3E6 and sage #E9EADE, deep olive #3F6212, subtle warm ivory. No other bright hues, no photography, no 3D, no watermarks. High quality composition at a natural 4:3 landscape ratio, target 1024 by768 pixels. Fill every edge; no frame or outer whitespace, no text, letters, numbers, logo, UI, interface cards, buttons, collage or diagram. It will be framed in an8px-rounded webpage image; do not bake rounded corners.\nScene: a softer landing. A quiet evening reading nook in tonal deep sage/olive: a small lamp casting a flat soft ivory pool of light onto a closed journal and steaming cup; a comfortable green armchair nearby, leafy houseplant, dark olive window with a small cream crescent moon. Comforting quiet mood. Preserve palette and paper grain from reference, no gradients that look glossy, no black void. No people, no text.",
+      "inspection": "Reviewed final image; subject is complete, no text or UI, style and palette consistent with hero reference."
+    }
+  ]
+}

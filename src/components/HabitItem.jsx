@@ -33,6 +33,8 @@ export default function HabitItem({
   onDelete,
 }) {
   const [dialog, setDialog] = useState(null);
+  const isDaily =
+    !Array.isArray(habit.scheduledDays) || habit.scheduledDays.length === 7;
   const menuRef = useRef(null);
   useEffect(() => {
     const close = (event) => {
@@ -68,13 +70,10 @@ export default function HabitItem({
         )}
         <div className="habit-meta">
           <span>{eligible ? scheduleLabel(habit) : 'Not due today'}</span>
-          {habit.source === 'demo' && (
-            <span className="synthetic-label">Synthetic</span>
-          )}
           {habit.category && <span>{habit.category}</span>}
           <span className="streak">
             <Flame size={14} aria-hidden="true" />
-            {streak} day streak
+            {streak} {isDaily ? 'day' : 'scheduled-day'} streak
           </span>
           {streak >= 7 && (
             <span className="achievement">
@@ -85,7 +84,7 @@ export default function HabitItem({
         </div>
       </div>
       <div className="habit-prediction">
-        <RiskBadge prediction={prediction} aiEnabled={aiEnabled} />
+        {aiEnabled && <RiskBadge prediction={prediction} aiEnabled={aiEnabled} />}
       </div>
       <details
         className="actions-menu"
@@ -126,7 +125,7 @@ export default function HabitItem({
         open={dialog === 'edit'}
         onClose={() => setDialog(null)}
         title="Edit habit"
-        description="Update the name and description. Your check-in history is preserved."
+        description="Update your habit days and optional reminder. Your check-in history is preserved."
       >
         <AddHabitForm
           initialHabit={habit}
@@ -142,7 +141,7 @@ export default function HabitItem({
         open={dialog === 'delete'}
         onClose={() => setDialog(null)}
         title="Delete habit?"
-        description={`“${habit.name}” and its entire check-in history will be removed. Export a backup from Settings if you want to keep them.`}
+        description={`“${habit.name}” and its entire check-in history will be permanently removed.`}
       >
         <div className="dialog-actions">
           <button

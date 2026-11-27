@@ -1,29 +1,65 @@
-import { useState } from 'react';
-import Dialog from './Dialog';
-import DataExport from './DataExport';
 import './SupportingPages.css';
+import { useEffect, useState } from 'react';
+import {
+  enablePush,
+  getPushStatus,
+  sendPushTest,
+} from '../services/pushApi';
 
 function SettingsPanel({
+  token,
   aiEnabled,
   onAiToggle,
-  onLoadDemo,
-  habits = [],
-  completions = {},
-  onImport,
-  onClear,
 }) {
-  const [confirmDemo, setConfirmDemo] = useState(false);
-  const [demoLoaded, setDemoLoaded] = useState(false);
-  const loadDemo = () => {
-    onLoadDemo();
-    setConfirmDemo(false);
-    setDemoLoaded(true);
-  };
-  const requestDemo = () => {
-    if (habits.length || Object.keys(completions).length) setConfirmDemo(true);
-    else loadDemo();
-  };
+  const [pushMessage, setPushMessage] = useState('');
+  const [pushBusy, setPushBusy] = useState(false);
+  const [pushStatus, setPushStatus] = useState(null);
 
+  useEffect(() => {
+    let active = true;
+    getPushStatus(token)
+      .then((status) => {
+        if (active) setPushStatus(status);
+      })
+      .catch((error) => {
+        if (active) setPushMessage(error.message);
+      });
+    return () => {
+      active = false;
+    };
+  }, [token]);
+
+  async function handleEnablePush() {
+    setPushBusy(true);
+    setPushMessage('');
+    try {
+      await enablePush(token);
+      setPushStatus(await getPushStatus(token));
+      setPushMessage('This browser is subscribed to notifications.');
+    } catch (error) {
+      setPushMessage(error.message);
+    } finally {
+      setPushBusy(false);
+    }
+  }
+
+  async function handleTestPush() {
+    setPushBusy(true);
+    setPushMessage('');
+    try {
+      const result = await sendPushTest(token);
+      setPushMessage(
+        result.sent > 0
+          ? `Test notification sent to ${result.sent} browser(s).`
+          : 'The test notification could not be delivered. Please try again later.'
+      );
+      setPushStatus(await getPushStatus(token));
+    } catch (error) {
+      setPushMessage(error.message);
+    } finally {
+      setPushBusy(false);
+    }
+  }
   return (
     <div className="panel settings-panel">
       <section className="settings-section" aria-labelledby="ai-settings-title">
@@ -32,15 +68,15 @@ function SettingsPanel({
             AI features & privacy
           </h2>
           <p className="muted">
-            Optional predictions from your configured backend. All tracking and
-            Insights charts work locally with AI off.
+            Optional predictions use your saved habits and check-ins to help
+            you notice routines that may need a little more attention.
           </p>
         </div>
         <label className="settings-row ai-setting" htmlFor="ai-preference">
           <div>
             <h3>AI predictions</h3>
             <p className="muted">
-              Show the chance of missing tomorrow on Today and Insights.
+              Show which habits you may be likely to miss over the next three days.
             </p>
           </div>
           <input
@@ -56,78 +92,45 @@ function SettingsPanel({
         <div id="ai-sharing-details" className="privacy-note">
           <strong>{aiEnabled ? 'AI is on' : 'AI is off'}</strong>
           <p>
-            When enabled, habit IDs, creation dates, today’s date, and
-            completion dates are sent to the backend for predictions. Habit
-            names and descriptions are not included.
+            When enabled, your saved habit and completion history is processed
+            to estimate the risk of missing a habit. Predictions are a guide,
+            not a guarantee of what will happen.
           </p>
           <p>
-            AI starts off and your choice is saved in this browser. Turning it
-            off prevents further requests and cancels pending work where
-            possible. Information already sent cannot be recalled.
+            This preference is saved to your account. Turning it off prevents
+            new predictions from being requested.
           </p>
         </div>
       </section>
-      {onImport && onClear && (
-        <DataExport
-          embedded
-          habits={habits}
-          completions={completions}
-          onImport={onImport}
-          onClear={onClear}
-        />
-      )}
-      <section
-        className="settings-section"
-        aria-labelledby="demo-settings-title"
-      >
-        <div className="section-copy">
-          <h2 id="demo-settings-title" className="section-title">
-            Demo data
-          </h2>
-          <p className="muted">
-            Explore Insights with six synthetic habits and 84 days of
-            deterministic history, including steady routines, a decline, and an
-            improvement.
-          </p>
-        </div>
-        <div className="settings-row">
-          <div>
-            <h3>Load synthetic history</h3>
-            <p className="muted">
-              Replaces current habits and history. Your AI preference is
-              preserved.
-            </p>
-          </div>
-          <button className="btn btn-secondary" onClick={requestDemo}>
-            Load demo data
-          </button>
-        </div>
-        {demoLoaded && (
-          <p className="status-note" role="status">
-            Synthetic demo data loaded. Open Today, Calendar, or Insights to
-            explore it.
-          </p>
-        )}
-      </section>
-      <Dialog
-        open={confirmDemo}
-        onClose={() => setConfirmDemo(false)}
-        title="Replace your data with demo habits?"
-        description="This replaces your current habits and completion history with synthetic demonstration data. Export a JSON backup first if you want to keep your data. Your AI preference will be preserved."
-      >
-        <div className="dialog-actions">
+      <section className="settings-section">
+        <h2>Browser notifications</h2>
+        <p className="muted" role="status">
+          {pushStatus === null
+            ? 'Checking browser subscription…'
+            : pushStatus.subscriptions > 0
+              ? `Enabled on ${pushStatus.subscriptions} browser(s).`
+              : 'This browser is not subscribed yet.'}
+        </p>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={handleEnablePush}
+          disabled={pushBusy}
+        >
+          {pushBusy ? 'Enabling…' : 'Enable browser notifications'}
+        </button>
+        {pushStatus?.subscriptions > 0 && (
           <button
-            data-autofocus
+            type="button"
             className="btn btn-secondary"
-            onClick={() => setConfirmDemo(false)}
+            onClick={handleTestPush}
+            disabled={pushBusy}
           >
-            Cancel
+            Send test notification
           </button>
-          <button className="btn btn-primary" onClick={loadDemo}>
-            Replace with demo data
-          </button>
-        </div>
-      </Dialog>
+        )}
+        {pushMessage && <p role="status">{pushMessage}</p>}
+      </section>
     </div>
   );
 }

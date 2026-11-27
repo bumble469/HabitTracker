@@ -79,22 +79,29 @@ function DataExport({
     reader.readAsText(file);
   };
 
-  const confirmAction = () => {
-    if (confirmation.type === 'import') {
-      onImport(confirmation.data.habits, confirmation.data.completions);
-      setFeedback({
-        message: 'Backup imported. Your AI preference has been preserved.',
-        error: false,
-      });
-    } else {
-      onClear();
-      setFeedback({
-        message:
-          'All habits and completion history have been cleared. Your AI preference has been preserved.',
-        error: false,
-      });
+  const confirmAction = async () => {
+    setReading(true);
+    setFeedback(null);
+    try {
+      if (confirmation.type === 'import') {
+        await onImport(confirmation.data.habits, confirmation.data.completions);
+        setFeedback({
+          message: 'Backup habits were added to your account.',
+          error: false,
+        });
+      } else {
+        await onClear();
+        setFeedback({
+          message: 'All account habits and check-in history have been deleted.',
+          error: false,
+        });
+      }
+      setConfirmation(null);
+    } catch (error) {
+      setFeedback({ message: error.message, error: true });
+    } finally {
+      setReading(false);
     }
-    setConfirmation(null);
   };
 
   return (
@@ -107,8 +114,8 @@ function DataExport({
           Data import & export
         </h2>
         <p className="muted">
-          Your habits and history are stored in this browser. Keep a JSON backup
-          before replacing or clearing them.
+          Your habits and check-in history are stored in your account. Download
+          a JSON backup or import habits from an existing backup.
         </p>
       </div>
       <div className="settings-row">
@@ -126,8 +133,8 @@ function DataExport({
         <div>
           <h3>Import a backup</h3>
           <p className="muted">
-            Replaces current habits and history after you confirm. AI
-            preferences are kept.
+            Adds the habits and check-ins in a backup to your account after you
+            confirm.
           </p>
         </div>
         <button
@@ -149,10 +156,10 @@ function DataExport({
       </div>
       <div className="settings-row">
         <div>
-          <h3>Clear local data</h3>
+          <h3>Clear account data</h3>
           <p className="muted">
-            Permanently remove all habits and completion history from this
-            browser.
+            Permanently remove all habits and check-in history from your
+            account.
           </p>
         </div>
         <button
@@ -180,13 +187,13 @@ function DataExport({
         onClose={() => setConfirmation(null)}
         title={
           confirmation?.type === 'import'
-            ? 'Replace current data?'
-            : 'Clear all local data?'
+            ? 'Import backup habits?'
+            : 'Clear all account data?'
         }
         description={
           confirmation?.type === 'import'
-            ? `Import ${confirmation.data.habits.length} habits and their completion history. This replaces the data currently in this browser. Export a backup first if you need it.`
-            : 'This permanently removes all habits and completion history. Export a backup first if you need it. Your AI preference will be kept.'
+            ? `Add ${confirmation.data.habits.length} habits and their check-in history to your account.`
+            : 'This permanently removes all habits and check-in history from your account. Export a backup first if you need it.'
         }
       >
         <div className="dialog-actions">
@@ -194,15 +201,19 @@ function DataExport({
             data-autofocus
             className="btn btn-secondary"
             onClick={() => setConfirmation(null)}
+            disabled={reading}
           >
             Cancel
           </button>
           <button
             className={`btn ${confirmation?.type === 'import' ? 'btn-primary' : 'btn-danger'}`}
             onClick={confirmAction}
+            disabled={reading}
           >
-            {confirmation?.type === 'import'
-              ? 'Replace and import'
+            {reading
+              ? 'Saving…'
+              : confirmation?.type === 'import'
+              ? 'Import habits'
               : 'Clear all data'}
           </button>
         </div>

@@ -174,7 +174,7 @@ function CalendarView({ completions, habits, today = toDateKey() }) {
               : 'No habits due on this day.'}
           </p>
         </div>
-        <ul className="calendar-habit-list">
+        <ul className="calendar-habit-list" aria-label="Habits for the selected date" tabIndex={0}>
           {selectedHabits.map((habit) => {
             const complete = (completions[habit.id] || []).includes(selected);
             return (

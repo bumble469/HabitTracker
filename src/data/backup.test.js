@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { validateBackup } from './backup';
-import { createDemoData } from './demoData';
-import { addDays, isEligibleDay } from '../utils/insights';
 
 const habit = {
   id: 'h1',
@@ -47,41 +45,4 @@ describe('existing JSON backup format', () => {
       habits: [],
       completions: {},
     }));
-});
-
-describe('synthetic frontend demo fixture', () => {
-  it('is deterministic and contains unique IDs and 84 days of varied eligible history', () => {
-    const today = '2026-11-22';
-    const demo = createDemoData(today);
-    expect(demo).toEqual(createDemoData(today));
-    expect(new Set(demo.habits.map((item) => item.id)).size).toBe(
-      demo.habits.length
-    );
-    expect(demo.habits).toHaveLength(6);
-    expect(
-      demo.habits.every((item) =>
-        item.createdAt.startsWith(addDays(today, -83))
-      )
-    ).toBe(true);
-    for (const item of demo.habits) {
-      expect(item.source).toBe('demo');
-      expect(demo.completions[item.id].length).toBeGreaterThan(0);
-      expect(
-        demo.completions[item.id].every(
-          (date) =>
-            date <= today &&
-            date >= addDays(today, -83) &&
-            isEligibleDay(item, date, today)
-        )
-      ).toBe(true);
-    }
-    expect(
-      new Set(Object.values(demo.completions).map((dates) => dates.length)).size
-    ).toBeGreaterThan(3);
-  });
-  it('retains the schema validated for import without including AI preferences', () => {
-    const demo = createDemoData('2027-01-03');
-    expect(validateBackup(demo)).toEqual(demo);
-    expect(demo).not.toHaveProperty('aiEnabled');
-  });
 });
