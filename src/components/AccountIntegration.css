@@ -1,0 +1,444 @@
+.auth-page {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  padding: 20px;
+  background: var(--background, #f9f9f7);
+}
+.auth-story {
+  position: relative;
+  min-height: calc(100dvh - 40px);
+  overflow: hidden;
+  border-radius: 0;
+  background: #111111;
+  color: #f9f9f7;
+  padding: 40px 44px;
+  display: flex;
+  flex-direction: column;
+}
+.auth-story-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.auth-story-brand .brand-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 0;
+  background: #f9f9f7;
+  color: #111111;
+}
+.auth-story-brand strong {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+.auth-story-brand strong span {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: #e5e5e0;
+  margin-top: 2px;
+}
+.auth-story-copy {
+  position: relative;
+  z-index: 1;
+  margin-top: clamp(70px, 13vh, 150px);
+}
+.auth-story-eyebrow {
+  color: #f9f9f7;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.17em;
+  margin-bottom: 22px;
+}
+.auth-story-copy h2 {
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: clamp(42px, 4.5vw, 68px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.045em;
+}
+.auth-story-copy h2 em {
+  font-weight: 400;
+  color: #f9f9f7;
+}
+.auth-story-copy > p:last-child {
+  margin-top: 24px;
+  font-size: 14px;
+  line-height: 1.9;
+  color: #e5e5e0;
+}
+.auth-botanical {
+  position: absolute;
+  color: #f9f9f7;
+  width: min(78%, 410px);
+  height: auto;
+  right: -25px;
+  bottom: 42px;
+  opacity: 0.8;
+  pointer-events: none;
+}
+.auth-story-footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding-top: 28px;
+  margin-top: auto;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: #e5e5e0;
+}
+.auth-form-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 48px;
+}
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+}
+.auth-brand {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 40px;
+  color: var(--primary, #111111);
+}
+.auth-eyebrow {
+  letter-spacing: 0.15em;
+  font-size: 10px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.auth-card h1 {
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 40px;
+  line-height: 1.15;
+  letter-spacing: -0.045em;
+  font-weight: 400;
+  margin-bottom: 14px;
+}
+.auth-card > .muted {
+  font-size: 14px;
+  line-height: 1.7;
+  max-width: 360px;
+}
+.auth-alternate {
+  width: 100%;
+  margin-top: 18px;
+  border-color: transparent;
+  background: transparent;
+  color: var(--primary, #111111);
+  font-size: 13px;
+}
+.auth-alternate:hover:not(:disabled) {
+  border-color: var(--border, #111111);
+  background: #e5e5e0;
+}
+.account-form {
+  display: grid;
+  gap: 20px;
+  margin: 28px 0 12px;
+  max-width: 600px;
+}
+.account-form .btn {
+  justify-self: start;
+}
+.auth-card .account-form .btn {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 8px;
+  border-radius: 0;
+}
+.auth-card .input {
+  min-height: 48px;
+  background-color: transparent;
+  border: 0;
+  border-bottom: 1px solid #111111;
+  border-radius: 0;
+}
+.auth-card .input:focus {
+  border-color: var(--primary, #111111);
+}
+.auth-card .input[aria-invalid='true'] {
+  border-color: var(--danger, #cc0000);
+}
+.auth-form-footer {
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border, #111111);
+  text-align: center;
+  color: var(--muted, #737373);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.coach-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(0, 2fr);
+  gap: 0;
+  align-items: stretch;
+}
+.coach-conversations,
+.coach-thread {
+  min-width: 0;
+  padding: 28px;
+}
+.coach-conversations {
+  background: #f9f9f7;
+}
+.coach-conversations h2 {
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+.coach-conversations > .btn {
+  width: 100%;
+}
+.coach-list {
+  list-style: none;
+  padding: 0;
+  margin: 24px 0 0;
+  display: grid;
+  gap: 6px;
+}
+.coach-list button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 15px 14px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.coach-list button:hover {
+  background: #e5e5e0;
+}
+.coach-list button[aria-pressed='true'] {
+  background: #e5e5e0;
+  border-color: #111111;
+  color: var(--primary, #111111);
+}
+.coach-list small {
+  display: block;
+  color: var(--muted);
+  margin-top: 6px;
+  font-size: 11px;
+}
+.coach-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.coach-heading h2 {
+  overflow-wrap: anywhere;
+  font-size: 20px;
+  font-weight: 500;
+}
+.coach-messages {
+  display: grid;
+  gap: 20px;
+  padding: 24px 0;
+}
+.coach-message {
+  padding: 20px 22px;
+  border-radius: 0;
+  background: #f9f9f7;
+  border: 1px solid #111111;
+  overflow-wrap: anywhere;
+  margin-right: 24px;
+}
+.coach-message-user {
+  background: #e5e5e0;
+  border-color: #111111;
+  border-radius: 0;
+  margin-left: 24px;
+  margin-right: 0;
+}
+.coach-message header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.coach-message header strong {
+  color: var(--primary, #111111);
+  font-size: 12px;
+  font-weight: 600;
+}
+.coach-message time {
+  font-size: 10px;
+  color: var(--muted);
+}
+.coach-message p {
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.coach-sources {
+  margin: 16px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+}
+.coach-composer {
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+  display: grid;
+  gap: 12px;
+}
+.coach-composer textarea {
+  resize: vertical;
+  background: #f9f9f7;
+  border-radius: 0;
+  min-height: 110px;
+  padding: 16px;
+}
+.coach-composer .btn {
+  justify-self: end;
+}
+.coach-preview {
+  margin-bottom: 20px;
+  background: #e5e5e0;
+  border-color: #111111;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.coach-thread .status-note .btn {
+  margin-top: 12px;
+}
+@media (max-width: 1050px) {
+  .auth-story {
+    padding: 32px;
+  }
+  .auth-form-area {
+    padding: 40px 32px;
+  }
+  .auth-story-copy h2 {
+    font-size: 48px;
+  }
+  .auth-botanical {
+    width: 90%;
+  }
+}
+@media (max-width: 800px) {
+  .auth-page {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0;
+  }
+  .auth-story {
+    display: none;
+  }
+  .auth-form-area {
+    padding: 40px 24px;
+    min-height: 100dvh;
+  }
+  .auth-brand {
+    display: flex;
+  }
+  .auth-card h1 {
+    font-size: 36px;
+  }
+  .coach-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .coach-list {
+    max-height: 230px;
+    overflow: auto;
+  }
+}
+@media (max-width: 599px) {
+  .auth-form-area {
+    padding: 28px 24px;
+  }
+  .auth-card .account-form {
+    gap: 18px;
+  }
+  .coach-conversations,
+  .coach-thread {
+    padding: 20px;
+  }
+  .coach-message,
+  .coach-message-user {
+    padding: 16px;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+/* Legacy account and Coach surfaces share the newsprint design. */
+.auth-story-brand strong,
+.auth-story-brand strong span,
+.auth-story-eyebrow,
+.auth-story-footer,
+.auth-eyebrow,
+.auth-form-footer,
+.coach-message header strong {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.auth-story-copy > p:last-child::first-letter {
+  float: left;
+  padding: 5px 9px 0 0;
+  font: 3.5em/0.85 Georgia, 'Times New Roman', serif;
+}
+.coach-thread {
+  border-left: 0;
+}
+.coach-conversations h2,
+.coach-heading h2 {
+  font-family: var(--font-serif, Georgia, 'Times New Roman', serif);
+  font-weight: 400;
+}
+.coach-list {
+  gap: 0;
+}
+.coach-list button {
+  border: 0;
+  border-top: 1px solid #111111;
+}
+.coach-list button[aria-pressed='true'] {
+  background: #111111;
+  color: #f9f9f7;
+}
+.coach-list button[aria-pressed='true'] small {
+  color: #e5e5e0;
+}
+.coach-list small,
+.coach-message time,
+.coach-sources {
+  font-family: var(--font-mono, 'JetBrains Mono', 'Courier New', monospace);
+}
+.coach-message-user {
+  background: #111111;
+  color: #f9f9f7;
+}
+.coach-message-user header strong,
+.coach-message-user time,
+.coach-message-user .coach-sources {
+  color: #f9f9f7;
+}
+.coach-composer textarea {
+  border: 0;
+  border-bottom: 1px solid #111111;
+  padding-left: 0;
+}
+@media (max-width: 800px) {
+  .coach-thread {
+    border-top: 0;
+    border-left: 1px solid var(--border, #111111);
+  }
+}

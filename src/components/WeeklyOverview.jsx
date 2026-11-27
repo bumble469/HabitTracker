@@ -39,16 +39,18 @@ export default function WeeklyOverview({
   return (
     <aside className="support-column">
       <section className="panel week-overview">
-        <div className="panel-header">
-          <h2 className="section-title">Last 7 days</h2>
-          <ChartNoAxesCombined size={19} className="muted" aria-hidden="true" />
-        </div>
+        <div className="week-header">
+          <div className="panel-header">
+            <div><p className="week-kicker">Consistency</p><h2 className="section-title">Last 7 days</h2></div>
+            <ChartNoAxesCombined size={19} className="muted" aria-hidden="true" />
+          </div>
         <div className="week-number numeric">
           {total ? `${Math.round((completed / total) * 100)}%` : '—'}
           <span>consistency</span>
         </div>
+        </div>
         <p className="muted">
-          {completed} of {total} eligible check-ins
+          {completed} of {total} planned check-ins completed
         </p>
         <div
           className="week-bars"
@@ -76,10 +78,9 @@ export default function WeeklyOverview({
       <section className="local-note">
         <ShieldCheck size={21} aria-hidden="true" />
         <div>
-          <h2>Local by default</h2>
+          <h2>Account & privacy</h2>
           <p>
-            Your habits and check-ins are saved in this browser.{' '}
-            {aiEnabled ? 'AI sharing is enabled.' : 'AI sharing is off.'}
+            {aiEnabled ? 'Optional AI predictions are on.' : 'Optional AI predictions are off.'}
           </p>
           <button className="text-button" onClick={onOpenSettings}>
             Manage privacy

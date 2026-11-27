@@ -1,184 +1,83 @@
-// @vitest-environment jsdom
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+vi.mock('./api', () => ({ api: vi.fn() }));
+import { api } from './api';
 import {
-  isAiEnabled,
-  isApiConfigured,
-  predictMissingTomorrow,
-  requestAiJson,
-  setAiPreference,
+  getRisk,
+  getRiskHistory,
+  riskErrorMessage,
   validatePrediction,
 } from './predictionApi';
-
-const payload = {
-  habit_id: 'real-habit',
-  created_on: '2026-11-01',
-  today: '2026-11-22',
-  completed_dates: ['2026-11-21'],
-};
 const valid = {
-  probability: 0.72,
+  habit_id: 'opaque-habit',
+  as_of: '2026-11-23',
+  risk: 0.499,
   level: 'high',
-  reason: 'Low completion this week',
+  reasons: [],
 };
-const jsonResponse = (data) => ({ ok: true, json: async () => data });
+afterEach(() => vi.clearAllMocks());
 
-beforeEach(() => {
-  localStorage.clear();
-  vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:8000/');
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse(valid)));
-});
-afterEach(() => {
-  setAiPreference(false);
-  vi.unstubAllGlobals();
-  vi.unstubAllEnvs();
-  vi.useRealTimers();
-});
-
-describe('prediction response validation', () => {
-  it('accepts finite probabilities and preserves backend levels and reasons', () => {
+describe('database-backed prediction contract', () => {
+  it('keeps server levels and empty reasons at rounding boundaries', () => {
     expect(validatePrediction(valid)).toEqual(valid);
+    expect(validatePrediction({ ...valid, risk: 0, level: 'low' }).risk).toBe(
+      0
+    );
     expect(
-      validatePrediction({ ...valid, probability: 0, level: 'backend-custom' })
-    ).toEqual({ ...valid, probability: 0, level: 'backend-custom' });
-    expect(validatePrediction({ ...valid, probability: 1 })).not.toBeNull();
+      validatePrediction({ ...valid, risk: null, level: 'not_enough_data' })
+        .risk
+    ).toBeNull();
   });
   it.each([
     null,
     {},
-    { ...valid, probability: NaN },
-    { ...valid, probability: Infinity },
-    { ...valid, probability: -0.1 },
-    { ...valid, probability: 1.1 },
-    { ...valid, probability: '0.72' },
-    { ...valid, reason: '' },
-    { ...valid, level: ' ' },
-  ])('rejects malformed prediction %j', (value) => {
+    { ...valid, risk: NaN },
+    { ...valid, risk: -1 },
+    { ...valid, risk: 2 },
+    { ...valid, risk: null },
+    { ...valid, reasons: 'reason' },
+    { ...valid, as_of: '2026-02-30' },
+    { ...valid, as_of: '2026-11-23T00:00:00Z' },
+  ])('rejects malformed risk %j', (value) => {
     expect(validatePrediction(value)).toBeNull();
   });
-});
-
-describe('shared AI request privacy and failure handling', () => {
-  it('defaults off and blocks prediction, Coach and health requests before fetch', async () => {
-    expect(isAiEnabled()).toBe(false);
-    for (const path of ['/predict', '/coach', '/health']) {
-      await expect(requestAiJson(path, payload)).rejects.toMatchObject({
-        name: 'AbortError',
-      });
-    }
-    expect(fetch).not.toHaveBeenCalled();
-  });
-  it('honors a persisted off preference after a module reload', async () => {
-    setAiPreference(false);
-    vi.resetModules();
-    const reloaded = await import('./predictionApi');
-    await expect(
-      reloaded.predictMissingTomorrow(payload)
-    ).rejects.toMatchObject({ name: 'AbortError' });
-    expect(fetch).not.toHaveBeenCalled();
-  });
-  it('posts only the real payload after opt-in and normalizes the URL', async () => {
-    setAiPreference(true);
-    await expect(predictMissingTomorrow(payload)).resolves.toEqual(valid);
-    expect(fetch).toHaveBeenCalledExactlyOnceWith(
-      'http://localhost:8000/predict',
-      expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify(payload),
-        headers: { 'Content-Type': 'application/json' },
-      })
-    );
-  });
-  it.each([
-    '',
-    'not-a-url',
-    'javascript:alert(1)',
-    'http://secret:password@localhost:8000',
-  ])('rejects missing/invalid API configuration %s locally', async (base) => {
-    vi.stubEnv('VITE_API_BASE_URL', base);
-    setAiPreference(true);
-    expect(isApiConfigured()).toBe(false);
-    await expect(predictMissingTomorrow(payload)).rejects.toThrow(
-      'The prediction service is not configured.'
-    );
-    expect(fetch).not.toHaveBeenCalled();
-  });
-  it('reports non-success status, malformed predictions, and invalid JSON', async () => {
-    setAiPreference(true);
-    fetch.mockResolvedValueOnce({ ok: false, status: 503 });
-    await expect(predictMissingTomorrow(payload)).rejects.toThrow('HTTP 503');
-    fetch.mockResolvedValueOnce(jsonResponse({ probability: 5 }));
-    await expect(predictMissingTomorrow(payload)).rejects.toThrow(
-      'malformed prediction'
-    );
-    fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => {
-        throw new SyntaxError('bad');
-      },
-    });
-    await expect(predictMissingTomorrow(payload)).rejects.toThrow(
-      'invalid JSON'
-    );
-  });
-  it('reports a connection failure without sending automatic retries', async () => {
-    setAiPreference(true);
-    fetch.mockRejectedValueOnce(new TypeError('Failed to fetch'));
-    await expect(predictMissingTomorrow(payload)).rejects.toThrow(
-      'Check the backend connection'
-    );
-    expect(fetch).toHaveBeenCalledTimes(1);
-  });
-  it('times out even if a transport ignores AbortSignal', async () => {
-    vi.useFakeTimers();
-    setAiPreference(true);
-    fetch.mockImplementation(() => new Promise(() => {}));
-    const pending = requestAiJson('/predict', payload, { timeoutMs: 50 });
-    const assertion = expect(pending).rejects.toThrow('timed out');
-    await vi.advanceTimersByTimeAsync(50);
-    await assertion;
-    expect(fetch.mock.calls[0][1].signal.aborted).toBe(true);
-  });
-  it('aborts active work when switched off and ignores late data', async () => {
-    setAiPreference(true);
-    let resolve;
-    fetch.mockImplementation(
-      () =>
-        new Promise((done) => {
-          resolve = done;
-        })
-    );
-    const pending = predictMissingTomorrow(payload);
-    const assertion = expect(pending).rejects.toMatchObject({
-      name: 'AbortError',
-    });
-    setAiPreference(false);
-    expect(fetch.mock.calls[0][1].signal.aborted).toBe(true);
-    resolve(jsonResponse(valid));
-    await assertion;
-    expect(localStorage.getItem('aiEnabled')).toBe('false');
-  });
-  it('respects an already cancelled caller without sending data', async () => {
-    setAiPreference(true);
+  it('uses authenticated collection GET, indexes by habit id and does not post local data', async () => {
+    api.mockResolvedValueOnce([
+      valid,
+      { ...valid, habit_id: 'other', risk: null, level: 'not_enough_data' },
+    ]);
     const controller = new AbortController();
-    controller.abort();
-    await expect(
-      predictMissingTomorrow(payload, controller.signal)
-    ).rejects.toMatchObject({ name: 'AbortError' });
-    expect(fetch).not.toHaveBeenCalled();
-  });
-  it('fails closed if saving the privacy preference fails', async () => {
-    setAiPreference(true);
-    const write = vi
-      .spyOn(Storage.prototype, 'setItem')
-      .mockImplementation(() => {
-        throw new Error('Storage unavailable');
-      });
-    expect(setAiPreference(false)).toBe(false);
-    expect(isAiEnabled()).toBe(false);
-    await expect(predictMissingTomorrow(payload)).rejects.toMatchObject({
-      name: 'AbortError',
+    const results = await getRisk(controller.signal);
+    expect(api).toHaveBeenCalledExactlyOnceWith('/api/risk', {
+      signal: controller.signal,
     });
-    expect(fetch).not.toHaveBeenCalled();
-    write.mockRestore();
+    expect(results['opaque-habit']).toEqual(valid);
+    expect(results.other.risk).toBeNull();
+  });
+  it('keeps sparse history dates and null points and supports inclusive windows', async () => {
+    const { habit_id: _, ...point } = valid;
+    const sparse = [
+      point,
+      { ...point, as_of: '2026-11-25', risk: null, level: 'not_enough_data' },
+    ];
+    api.mockResolvedValueOnce(sparse);
+    expect(
+      await getRiskHistory('archived/id', undefined, {
+        start: '2026-11-01',
+        end: '2026-11-30',
+      })
+    ).toEqual(sparse);
+    expect(api).toHaveBeenCalledWith(
+      '/api/habits/archived%2Fid/risk/history?start=2026-11-01&end=2026-11-30',
+      { signal: undefined }
+    );
+  });
+  it('reports model failure without substituting scores or retrying', async () => {
+    const error = Object.assign(new Error('Model file not found.'), {
+      status: 503,
+    });
+    api.mockRejectedValueOnce(error);
+    await expect(getRisk()).rejects.toBe(error);
+    expect(riskErrorMessage(error)).toContain('model is not installed');
+    expect(api).toHaveBeenCalledTimes(1);
   });
 });

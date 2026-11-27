@@ -5,6 +5,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import SettingsPanel from './SettingsPanel';
 import DataExport from './DataExport';
 
+vi.mock('../services/pushApi', () => ({
+  getPushStatus: vi.fn().mockResolvedValue({ subscriptions: 0 }),
+  enablePush: vi.fn().mockResolvedValue(undefined),
+  sendPushTest: vi.fn().mockResolvedValue({ sent: 1 }),
+}));
+
 let container;
 let root;
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -25,57 +31,60 @@ beforeEach(() => {
   HTMLDialogElement.prototype.close = function () {
     this.open = false;
   };
-  window.localStorage.setItem('aiEnabled', 'true');
 });
 afterEach(async () => {
   await act(async () => root.unmount());
   container.remove();
-  window.localStorage.clear();
   vi.restoreAllMocks();
 });
 
-describe('settings replacement safeguards', () => {
-  it('requires confirmation before replacing existing data and preserves the persisted AI preference', async () => {
-    const onLoadDemo = vi.fn();
+describe('settings and account data safeguards', () => {
+  it('explains AI predictions and lets the user change their preference', async () => {
+    const onAiToggle = vi.fn();
     await act(async () =>
       root.render(
         <SettingsPanel
           habits={[habit]}
           completions={{ h1: [] }}
           aiEnabled
-          onAiToggle={vi.fn()}
-          onLoadDemo={onLoadDemo}
+          onAiToggle={onAiToggle}
         />
       )
     );
-    await click('Load demo data');
-    expect(onLoadDemo).not.toHaveBeenCalled();
-    expect(container.querySelector('dialog').open).toBe(true);
-    await click('Cancel');
-    expect(onLoadDemo).not.toHaveBeenCalled();
-    await click('Load demo data');
-    await click('Replace with demo data');
-    expect(onLoadDemo).toHaveBeenCalledOnce();
-    expect(window.localStorage.getItem('aiEnabled')).toBe('true');
-    expect(container.textContent).toContain('Synthetic demo data loaded');
+    expect(container.textContent).not.toContain('Demo data');
+    expect(container.textContent).toContain('use your saved habits and check-ins');
+    expect(container.textContent).toContain('new predictions from being requested');
+    const toggle = container.querySelector('#ai-preference');
+    await act(async () => {
+      toggle.click();
+      toggle.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    expect(onAiToggle).toHaveBeenCalled();
   });
-  it('loads a demo without a destructive prompt when there is no current data', async () => {
-    const onLoadDemo = vi.fn();
+  it('keeps account import, export, and clear controls out of settings', async () => {
+    const onImport = vi.fn();
+    const onClear = vi.fn();
     await act(async () =>
       root.render(
         <SettingsPanel
-          habits={[]}
-          completions={{}}
+          token="test-token"
+          habits={[habit]}
+          completions={{ h1: ['2026-01-02'] }}
           aiEnabled={false}
           onAiToggle={vi.fn()}
-          onLoadDemo={onLoadDemo}
+          onImport={onImport}
+          onClear={onClear}
         />
       )
     );
-    await click('Load demo data');
-    expect(onLoadDemo).toHaveBeenCalledOnce();
+
+    expect(container.querySelector('input[type="file"]')).toBeNull();
+    expect(container.textContent).not.toMatch(/import|export|clear all data/i);
+    expect(container.textContent).toContain('Browser notifications');
+    expect(onImport).not.toHaveBeenCalled();
+    expect(onClear).not.toHaveBeenCalled();
   });
-  it('confirms before clearing and leaves AI preference intact', async () => {
+  it('confirms before clearing account data', async () => {
     const onClear = vi.fn();
     await act(async () =>
       root.render(
@@ -94,7 +103,6 @@ describe('settings replacement safeguards', () => {
     );
     await act(async () => confirm.click());
     expect(onClear).toHaveBeenCalledOnce();
-    expect(window.localStorage.getItem('aiEnabled')).toBe('true');
   });
   it('validates a file and waits for confirmation before invoking import', async () => {
     const onImport = vi.fn();
@@ -128,8 +136,7 @@ describe('settings replacement safeguards', () => {
       await new Promise((resolve) => setTimeout(resolve, 30));
     });
     expect(onImport).not.toHaveBeenCalled();
-    await click('Replace and import');
+    await click('Import habits');
     expect(onImport).toHaveBeenCalledWith([habit], { h1: ['2026-01-02'] });
-    expect(window.localStorage.getItem('aiEnabled')).toBe('true');
   });
 });

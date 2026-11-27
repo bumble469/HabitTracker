@@ -3,25 +3,35 @@ import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
-import { toDateKey } from './utils/insights';
-
-// jsdom has no layout engine. Keep the report components and their accessible
-// data alternatives real while omitting only Recharts' measured SVG surfaces.
-vi.mock('recharts', async (importOriginal) => ({
-  ...(await importOriginal()),
-  ResponsiveContainer: () => null,
-}));
+import { AUTH_SESSION_KEY } from './services/authApi';
 
 let root;
 let container;
 let fetchMock;
+let serverHabits;
+let serverCompletions;
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
-const seedHabit = {
-  id: 'existing',
-  name: 'Existing habit',
-  description: 'Keep this history',
-  createdAt: '2026-09-01T09:00:00',
+
+const user = {
+  id: 'user-1',
+  email: 'person@example.com',
+  display_name: 'Test Person',
+  timezone: 'Asia/Kolkata',
+  ai_enabled: false,
 };
+const serverHabit = {
+  id: 'backend-habit',
+  name: 'Backend habit',
+  description: 'Loaded from the API',
+  created_on: '2026-10-01',
+  archived_at: null,
+  reminder_time: null,
+};
+const jsonResponse = (data, status = 200) => ({
+  ok: status >= 200 && status < 300,
+  status,
+  json: async () => data,
+});
 const activeDialog = () => container.querySelector('dialog[open]');
 const namedButton = (name, scope = container) =>
   [...scope.querySelectorAll('button')].find(
@@ -32,14 +42,12 @@ const clickButton = async (name, scope = container) => {
   expect(target, `button ${name}`).toBeTruthy();
   await act(async () => target.click());
 };
-const navigate = async (label) =>
-  clickButton(label, container.querySelector('.sidebar nav'));
-const setField = async (labelText, value) => {
-  const scope = activeDialog();
-  const label = [...scope.querySelectorAll('label')].find((element) =>
-    element.textContent.startsWith(labelText)
-  );
-  const field = document.getElementById(label.htmlFor);
+const setField = async (name, value) => {
+  const field = activeDialog().querySelector(`[name="${name}"]`) ||
+    [...activeDialog().querySelectorAll('input,textarea')].find((item) =>
+      item.labels?.[0]?.textContent.startsWith(name)
+    );
+  expect(field).toBeTruthy();
   const prototype =
     field.tagName === 'TEXTAREA'
       ? HTMLTextAreaElement.prototype
@@ -49,25 +57,19 @@ const setField = async (labelText, value) => {
     field.dispatchEvent(new Event('input', { bubbles: true }));
   });
 };
-const submit = async () =>
+const submit = () =>
   act(async () =>
     activeDialog()
       .querySelector('form')
       .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
   );
-const mount = async () => act(async () => root.render(<App />));
-const reload = async () => {
-  await act(async () => root.unmount());
-  root = createRoot(container);
-  await mount();
-};
+const mount = () => act(async () => root.render(<App />));
 
 beforeEach(() => {
+  window.history.replaceState(null, '', '/app');
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(new Date('2026-11-22T12:00:00+05:30'));
-  vi.stubEnv('VITE_API_BASE_URL', 'https://backend.example.test');
-  fetchMock = vi.fn().mockRejectedValue(new TypeError('Backend offline'));
-  vi.stubGlobal('fetch', fetchMock);
+  vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:8000');
   vi.stubGlobal('requestAnimationFrame', (callback) => {
     callback();
     return 1;
@@ -78,150 +80,246 @@ beforeEach(() => {
   HTMLDialogElement.prototype.close = function () {
     this.open = false;
   };
-  window.localStorage.clear();
+  localStorage.clear();
+  sessionStorage.setItem(
+    AUTH_SESSION_KEY,
+    JSON.stringify({ access_token: 'test-token', user })
+  );
+  serverHabits = [{ ...serverHabit }];
+  serverCompletions = { 'backend-habit': ['2026-11-21'] };
+  fetchMock = vi.fn(async (url, options = {}) => {
+    const path = new URL(url).pathname;
+    const method = options.method || 'GET';
+    if (path === '/api/auth/me') return jsonResponse(user);
+    if (path === '/api/auth/login' && method === 'POST')
+      return jsonResponse({ access_token: 'test-token', user });
+    if (path === '/api/habits' && method === 'GET')
+      return jsonResponse(serverHabits);
+    if (path === '/api/completions') return jsonResponse(serverCompletions);
+    if (path === '/api/habits' && method === 'POST') {
+      const body = JSON.parse(options.body);
+      const created = {
+        ...serverHabit,
+        id: 'created-habit',
+        ...body,
+        created_on: '2026-11-22',
+      };
+      serverHabits.push(created);
+      serverCompletions[created.id] = [];
+      return jsonResponse(created, 201);
+    }
+    if (path === '/api/habits/created-habit' && method === 'PATCH') {
+      serverHabits[1] = {
+        ...serverHabits[1],
+        ...JSON.parse(options.body),
+      };
+      return jsonResponse(serverHabits[1]);
+    }
+    if (path === '/api/habits/created-habit/completions/2026-11-22') {
+      if (method === 'PUT')
+        serverCompletions['created-habit'].push('2026-11-22');
+      if (method === 'DELETE')
+        serverCompletions['created-habit'] = serverCompletions[
+          'created-habit'
+        ].filter((day) => day !== '2026-11-22');
+      return { ok: true, status: 204 };
+    }
+    if (path === '/api/habits/created-habit' && method === 'DELETE') {
+      serverHabits = serverHabits.filter(
+        (habit) => habit.id !== 'created-habit'
+      );
+      delete serverCompletions['created-habit'];
+      return { ok: true, status: 204 };
+    }
+    throw new Error(`Unexpected request: ${method} ${path}`);
+  });
+  vi.stubGlobal('fetch', fetchMock);
   container = document.createElement('div');
   document.body.append(container);
   root = createRoot(container);
 });
+
 afterEach(async () => {
   await act(async () => root.unmount());
   container.remove();
-  window.localStorage.clear();
+  localStorage.clear();
+  sessionStorage.clear();
   vi.useRealTimers();
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
-  vi.restoreAllMocks();
 });
 
-describe('offline App workflows', () => {
-  it('creates, checks in, edits, reloads, and confirms deletion without a backend', async () => {
-    await mount();
-    await clickButton('Add habit');
-    await submit();
-    expect(activeDialog().textContent).toContain('Enter a habit name.');
-    await setField('Habit name', 'Read for 20 minutes');
-    await setField('Description', 'Before bed');
-    await submit();
-    let storedHabits = JSON.parse(localStorage.getItem('habits'));
-    expect(storedHabits).toHaveLength(1);
-    expect(storedHabits[0].name).toBe('Read for 20 minutes');
-    const id = storedHabits[0].id;
-    const today = toDateKey();
-    await act(async () =>
-      container
-        .querySelector('[aria-label="Complete: Read for 20 minutes"]')
-        .click()
-    );
-    expect(JSON.parse(localStorage.getItem('completions'))[id]).toEqual([
-      today,
-    ]);
-    expect(
-      container.querySelector('.habit-check').getAttribute('aria-pressed')
-    ).toBe('true');
-    await act(async () =>
-      container.querySelector('.actions-menu summary').click()
-    );
-    await clickButton('Edit habit', container.querySelector('.actions-menu'));
-    await setField('Habit name', 'Read before bed');
-    await clickButton('Save changes', activeDialog());
-    storedHabits = JSON.parse(localStorage.getItem('habits'));
-    expect(storedHabits[0].name).toBe('Read before bed');
-    expect(JSON.parse(localStorage.getItem('completions'))[id]).toEqual([
-      today,
-    ]);
-    await reload();
-    expect(container.querySelector('.habit-row h3').textContent).toBe(
-      'Read before bed'
-    );
-    expect(
-      container.querySelector('.habit-check').getAttribute('aria-pressed')
-    ).toBe('true');
-    await act(async () =>
-      container.querySelector('.actions-menu summary').click()
-    );
-    await clickButton('Delete habit', container.querySelector('.actions-menu'));
-    await clickButton('Cancel', activeDialog());
-    expect(JSON.parse(localStorage.getItem('habits'))).toHaveLength(1);
-    expect(JSON.parse(localStorage.getItem('completions'))[id]).toEqual([
-      today,
-    ]);
-    await act(async () =>
-      container.querySelector('.actions-menu summary').click()
-    );
-    await clickButton('Delete habit', container.querySelector('.actions-menu'));
-    await clickButton('Delete habit', activeDialog());
-    expect(JSON.parse(localStorage.getItem('habits'))).toEqual([]);
-    expect(JSON.parse(localStorage.getItem('completions'))).toEqual({});
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
-
-  it('keeps every existing tab usable and sends no requests with persisted AI off, including after reload', async () => {
-    localStorage.setItem('habits', JSON.stringify([seedHabit]));
-    localStorage.setItem(
-      'completions',
-      JSON.stringify({ existing: ['2026-11-21'] })
-    );
-    localStorage.setItem('aiEnabled', 'false');
-    await mount();
-    for (const [label, heading] of [
-      ['Habits', 'Your habits'],
-      ['Calendar', 'Calendar'],
-      ['Statistics', 'Statistics'],
-      ['Insights', 'Insights'],
-      ['Data', 'Data'],
-      ['Settings', 'Settings'],
-      ['Dashboard', 'Today'],
-    ]) {
-      await navigate(label);
-      expect(container.querySelector('h1').textContent).toBe(heading);
+describe('backend-backed app', () => {
+  it.each([false, true])('builds overview tiles only from the signed-in account (empty: %s)', async (empty) => {
+    if (empty) {
+      serverHabits = [];
+      serverCompletions = {};
     }
-    await navigate('Insights');
-    expect(container.textContent).toContain('Weekly consistency');
-    expect(container.textContent).toContain('Drop-off summary');
-    await reload();
-    expect(container.querySelector('h1').textContent).toBe('Today');
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(localStorage.getItem('aiEnabled')).toBe('false');
+    await mount();
+    const metric = (label) => container.querySelector(`[role="group"][aria-label="${label}"] strong`).textContent;
+    expect(metric('Your routines')).toBe(empty ? '0' : '1');
+    expect(metric('Due today')).toBe(empty ? '0' : '1');
+    expect(metric('Completed today')).toBe('0');
+    expect(metric('Current streak')).toBe(empty ? '0 days' : '1 day');
+    expect(container.querySelector('[role="progressbar"][aria-label="Habits completed today"]').getAttribute('aria-valuenow')).toBe('0');
+  });
+  it('loads habits and check-ins from the API instead of browser demo data', async () => {
+    localStorage.setItem(
+      'habits',
+      JSON.stringify([{ id: 'local', name: 'Old local habit' }])
+    );
+    await mount();
+
+    expect(container.textContent).toContain('Backend habit');
+    expect(container.textContent).not.toContain('Old local habit');
+    expect(localStorage.getItem('habits')).toContain('Old local habit');
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:8000/api/habits',
+      expect.objectContaining({
+        headers: { Authorization: 'Bearer test-token' },
+      })
+    );
+    expect(
+      container
+        .querySelector('[aria-label="Complete: Backend habit"]')
+        .getAttribute('aria-pressed')
+    ).toBe('false');
   });
 
-  it('cancels habit creation without storing a partial habit', async () => {
+  it('creates, checks in, edits, and deletes habits through backend endpoints', async () => {
     await mount();
     await clickButton('Add habit');
-    await setField('Habit name', 'Unsaved habit');
-    await clickButton('Cancel', activeDialog());
-    expect(localStorage.getItem('habits')).toBeNull();
-    expect(container.querySelectorAll('.habit-row')).toHaveLength(0);
+    await setField('Habit name', 'Walk');
+    await setField('Description', 'Outside');
+    await submit();
+    expect(container.textContent).toContain('Walk');
+    expect(
+      fetchMock.mock.calls.some(
+        ([url, options]) =>
+          url.endsWith('/api/habits') &&
+          options.method === 'POST' &&
+          JSON.parse(options.body).name === 'Walk'
+      )
+    ).toBe(true);
+
+    await act(async () =>
+      container.querySelector('[aria-label="Complete: Walk"]').click()
+    );
+    expect(
+      fetchMock.mock.calls.some(
+        ([url, options]) =>
+          url.endsWith('/api/habits/created-habit/completions/2026-11-22') &&
+          options.method === 'PUT'
+      )
+    ).toBe(true);
+
+    await act(async () =>
+      container.querySelector('[aria-label="Actions for Walk"]').click()
+    );
+    await clickButton('Edit habit', container.querySelector('[aria-label="Actions for Walk"]').closest('.actions-menu'));
+    await setField('Habit name', 'Evening walk');
+    await clickButton('Save changes', activeDialog());
+    expect(container.textContent).toContain('Evening walk');
+
+    await act(async () =>
+      container.querySelector('[aria-label="Actions for Evening walk"]').click()
+    );
+    await clickButton('Delete habit', container.querySelector('[aria-label="Actions for Evening walk"]').closest('.actions-menu'));
+    await clickButton('Delete habit', activeDialog());
+    expect(
+      fetchMock.mock.calls.some(
+        ([url, options]) =>
+          url.includes('/api/habits/created-habit?permanent=true') &&
+          options.method === 'DELETE'
+      )
+    ).toBe(true);
+    expect(container.textContent).not.toContain('Evening walk');
+  });
+
+  it('shows login when there is no session and has no demo data control', async () => {
+    sessionStorage.clear();
+    await mount();
+    expect(container.querySelector('#auth-title').textContent).toBe(
+      'Welcome back'
+    );
+    expect(container.textContent).not.toContain('Load demo data');
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it.each([false, true])(
-    'replaces actual App data with a confirmed demo while preserving AI preference %s',
-    async (aiEnabled) => {
-      localStorage.setItem('habits', JSON.stringify([seedHabit]));
-      localStorage.setItem(
-        'completions',
-        JSON.stringify({ existing: ['2026-11-21'] })
-      );
-      localStorage.setItem('aiEnabled', JSON.stringify(aiEnabled));
+  it('keeps import and export out of ordinary navigation and settings', async () => {
+    await mount();
+    const navigation = container.querySelector('nav[aria-label="Main navigation"]');
+    expect(navigation.textContent).not.toMatch(/Data|Testing tools|Import|Export/);
+    await clickButton('Settings');
+    expect(container.querySelector('input[type="file"]')).toBeNull();
+    expect(namedButton('Export JSON')).toBeUndefined();
+    expect(namedButton('Import JSON')).toBeUndefined();
+    expect(namedButton('Clear all data')).toBeUndefined();
+  });
+
+  it.each(['/pratik', '/pratik/', '/Habit-Tracker-Web-App/pratik', '/Habit-Tracker-Web-App/pratik/index.html'])(
+    'preserves backup tools at the direct address %s', async (path) => {
+      window.history.replaceState(null, '', path);
       await mount();
-      await navigate('Settings');
-      const before = localStorage.getItem('habits');
-      await clickButton('Load demo data');
-      expect(localStorage.getItem('habits')).toBe(before);
-      await clickButton('Cancel', activeDialog());
-      expect(localStorage.getItem('habits')).toBe(before);
-      await clickButton('Load demo data');
-      await clickButton('Replace with demo data', activeDialog());
-      const demoHabits = JSON.parse(localStorage.getItem('habits'));
-      expect(demoHabits).toHaveLength(6);
-      expect(demoHabits.every((habit) => habit.source === 'demo')).toBe(true);
-      expect(
-        JSON.parse(localStorage.getItem('completions'))
-      ).not.toHaveProperty('existing');
-      expect(localStorage.getItem('aiEnabled')).toBe(JSON.stringify(aiEnabled));
-      await navigate('Dashboard');
-      expect(container.querySelectorAll('.habit-row')).toHaveLength(6);
-      if (!aiEnabled) expect(fetchMock).not.toHaveBeenCalled();
+      expect(namedButton('Export JSON')).toBeTruthy();
+      expect(namedButton('Import JSON')).toBeTruthy();
+      expect(container.querySelector('input[type="file"]')).toBeTruthy();
+      await clickButton('Overview');
+      expect(window.location.pathname).toBe(`${import.meta.env.BASE_URL}app`);
+      expect(namedButton('Export JSON')).toBeUndefined();
     }
   );
+
+  it('requires sign-in before showing the testing tools', async () => {
+    window.history.replaceState(null, '', '/pratik');
+    sessionStorage.clear();
+    await mount();
+    expect(container.querySelector('#auth-title').textContent).toBe('Welcome back');
+    expect(namedButton('Export JSON')).toBeUndefined();
+  });
+
+  it('always opens the normal app after signing in, including from /pratik', async () => {
+    window.history.replaceState(null, '', '/pratik');
+    sessionStorage.clear();
+    await mount();
+    await act(async () => {
+      for (const [name, value] of [['email', 'person@example.com'], ['password', 'existing-password']]) {
+        const field = container.querySelector(`input[name="${name}"]`);
+        Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(field, value);
+        field.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    });
+    await act(async () => container.querySelector('#auth-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })));
+    expect(window.location.pathname).toBe(`${import.meta.env.BASE_URL}app`);
+    expect(container.querySelector('h1').textContent).toBe('Today');
+    expect(namedButton('Export JSON')).toBeUndefined();
+    expect(namedButton('Import JSON')).toBeUndefined();
+  });
+
+  it('returns to the public landing page when logging out of testing tools', async () => {
+    window.history.replaceState(null, '', '/pratik');
+    await mount();
+    await clickButton('Log out');
+    await clickButton('Log out', activeDialog());
+    await vi.waitFor(() => expect(container.querySelector('.landing-page')).toBeTruthy());
+    expect(window.location.pathname).toBe(import.meta.env.BASE_URL);
+    expect(sessionStorage.getItem(AUTH_SESSION_KEY)).toBeNull();
+    expect(namedButton('Export JSON')).toBeUndefined();
+  });
+
+  it('opens sign-up from the landing page registration URL', async () => {
+    window.history.replaceState(null, '', '/app?mode=register');
+    sessionStorage.clear();
+    await mount();
+    expect(container.querySelector('#auth-title').textContent).toBe('Create your account');
+    expect(container.querySelector('input[name="confirm_password"]')).toBeTruthy();
+  });
+
+  it.each(['/', '/Habit-Tracker-Web-App/', '/Habit-Tracker-Web-App/index.html', '/landing.html'])('keeps %s public even with a saved session', async (path) => {
+    window.history.replaceState(null, '', path);
+    await mount();
+    await vi.waitFor(() => expect(container.querySelector('.landing-page')).toBeTruthy());
+    expect(container.querySelector('a[href$="app?mode=register"]')).toBeTruthy();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 });
