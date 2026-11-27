@@ -88,7 +88,7 @@ function StatisticsDashboard({ habits, completions, today = toDateKey() }) {
               margin={{ top: 12, right: 12, bottom: 8, left: 0 }}
               accessibilityLayer
             >
-              <CartesianGrid stroke="#DFE5E0" vertical={false} />
+              <CartesianGrid stroke="#edf1e7" vertical={false} />
               <XAxis
                 dataKey="date"
                 tickFormatter={(value) =>
@@ -97,7 +97,11 @@ function StatisticsDashboard({ habits, completions, today = toDateKey() }) {
                     day: 'numeric',
                   })
                 }
-                tick={{ fill: '#5F6B64', fontSize: 12 }}
+                tick={{
+                  fill: '#687365',
+                  fontSize: 11,
+                  fontFamily: 'var(--font-mono, "Courier New", monospace)',
+                }}
                 tickLine={false}
                 axisLine={false}
                 minTickGap={30}
@@ -106,13 +110,26 @@ function StatisticsDashboard({ habits, completions, today = toDateKey() }) {
                 domain={[0, 100]}
                 ticks={[0, 25, 50, 75, 100]}
                 tickFormatter={(value) => `${value}%`}
-                tick={{ fill: '#5F6B64', fontSize: 12 }}
+                tick={{
+                  fill: '#687365',
+                  fontSize: 11,
+                  fontFamily: 'var(--font-mono, "Courier New", monospace)',
+                }}
                 tickLine={false}
                 axisLine={false}
                 width={44}
               />
               <Tooltip
-                cursor={{ fill: '#EAF2ED' }}
+                contentStyle={{
+                  background: '#ffffff',
+                  border: '1px solid #e3e7dd',
+                  borderRadius: 10,
+                  boxShadow: 'none',
+                  fontFamily: 'var(--font-mono, "Courier New", monospace)',
+                  fontSize: 12,
+                }}
+                itemStyle={{ color: '#244b3d' }}
+                cursor={{ fill: '#edf1e7' }}
                 labelFormatter={(value) =>
                   parseDateKey(value).toLocaleDateString(undefined, {
                     weekday: 'short',
@@ -127,9 +144,9 @@ function StatisticsDashboard({ habits, completions, today = toDateKey() }) {
               />
               <Bar
                 dataKey="rate"
-                fill="#285A46"
+                fill="#244b3d"
                 maxBarSize={32}
-                radius={[3, 3, 0, 0]}
+                radius={[4, 4, 0, 0]}
                 isAnimationActive={false}
               />
             </BarChart>
@@ -137,7 +154,7 @@ function StatisticsDashboard({ habits, completions, today = toDateKey() }) {
         </div>
         <details className="chart-data-details">
           <summary>View daily values</summary>
-          <div className="table-scroll">
+          <div className="table-scroll" role="region" aria-label="Daily completion data" tabIndex={0}>
             <table className="data-table">
               <thead>
                 <tr>

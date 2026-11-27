@@ -15,16 +15,16 @@ export default function HabitList({
   management = false,
 }) {
   return (
-    <section className="panel habit-list-panel">
+    <section className={`panel habit-list-panel${management ? ' habit-management-panel' : ''}`}>
       <div className="panel-header">
         <div>
           <h2 className="section-title">
-            {management ? 'All habits' : 'Your habits'}
+            {management ? 'All habits' : 'Today’s habits'}
           </h2>
           <p className="muted">
             {management
               ? 'Manage your daily routines and check-in history.'
-              : 'Check in as you complete each habit.'}
+              : 'Check off a habit when you’re done.'}
           </p>
         </div>
         <span className="count-label">
@@ -44,6 +44,7 @@ export default function HabitList({
           </button>
         </div>
       ) : (
+        <div className="habit-list-scroll" role="region" aria-label={management ? 'Your habit list' : 'Today’s habit list'} tabIndex={0}>
         <ul className="habit-list">
           {habits.map((habit) => (
             <HabitItem
@@ -60,6 +61,7 @@ export default function HabitList({
             />
           ))}
         </ul>
+        </div>
       )}
     </section>
   );

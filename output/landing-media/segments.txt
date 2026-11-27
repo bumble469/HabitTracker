@@ -1,0 +1,6 @@
+file '/home/pratikvr/SPIT_PROJECTS/Habit-Tracker-Web-App/output/landing-media/segment-0.mp4'
+file '/home/pratikvr/SPIT_PROJECTS/Habit-Tracker-Web-App/output/landing-media/segment-1.mp4'
+file '/home/pratikvr/SPIT_PROJECTS/Habit-Tracker-Web-App/output/landing-media/segment-2.mp4'
+file '/home/pratikvr/SPIT_PROJECTS/Habit-Tracker-Web-App/output/landing-media/segment-3.mp4'
+file '/home/pratikvr/SPIT_PROJECTS/Habit-Tracker-Web-App/output/landing-media/segment-4.mp4'
+file '/home/pratikvr/SPIT_PROJECTS/Habit-Tracker-Web-App/output/landing-media/segment-5.mp4'
