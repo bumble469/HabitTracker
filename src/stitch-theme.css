@@ -1,0 +1,287 @@
+/* Implemented from Stitch project 1584266915899558638, Overview screen
+   f1315b71601549a69fca0968fab14c04. Layout and data stay in the React app. */
+.app-shell {
+  --background: #f9f7f2;
+  --surface: #fff;
+  --text: #252c26;
+  --muted: #677368;
+  --text-secondary: #677368;
+  --border: #e5e2da;
+  --primary: #1b3b2b;
+  --primary-hover: #102c1d;
+  --primary-soft: #d9e6dc;
+  --warning: #a45a35;
+  --warning-soft: #fdf0e9;
+  --radius: 16px;
+  grid-template-columns: 224px minmax(0, 1fr);
+  background: var(--background);
+}
+.app-shell .sidebar {
+  padding: 28px 14px 20px;
+  border: 0;
+  background: #1b3b2b;
+  color: #eaf3e9;
+}
+.app-shell .brand { padding: 0 10px; gap: 10px; color: #f7faf3; font-size: 18px; letter-spacing: -.03em; }
+.app-shell .brand-mark { color: #c5ecca; }
+.app-shell .sidebar nav { margin-top: 34px; gap: 8px; }
+.app-shell .nav-group-label { margin: 24px 13px 12px; color: #aec7b4; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+.app-shell .nav-item { min-height: 46px; padding: 11px 13px; gap: 11px; border-radius: 9px; color: #c2d5c7; font-size: 13px; }
+.app-shell .nav-item svg { width: 18px; height: 18px; }
+.app-shell .nav-item:hover { background: #284d37; color: #fff; }
+.app-shell .nav-item.active { color: #143421; background: #c5ecca; font-weight: 600; box-shadow: none; }
+.app-shell .nav-bottom { margin-top: 26px; padding-top: 14px; border-top: 1px solid #385341; }
+.app-shell .sidebar-footer { padding: 14px 10px; border: 0; border-radius: 12px; background: #123121; gap: 10px; }
+.app-shell .account-avatar { color: #173b23; background: #c5ecca; border: 0; }
+.app-shell .sidebar-footer strong { color: #f3f8ef; font-size: 12px; }
+.app-shell .sidebar-footer div > span { color: #b2cbb9; font-size: 11px; }
+.app-shell .topbar { min-height: 60px; padding-inline: 36px; background: #fbfaf7; border-bottom: 1px solid #eae7df; }
+.app-shell .topbar-location { color: #6b766b; }
+.app-shell .topbar-location strong { color: #354e3a; font-weight: 500; }
+.app-shell .privacy-link { padding: 6px 11px; border: 1px solid #dce5d9; border-radius: 20px; background: #eef3e9; color: #44634b; }
+.app-shell .privacy-link:hover { background: #e0ebda; }
+.app-shell .account-actions .text-button { color: #5a6a5c; }
+.app-shell .main-content { max-width: 1390px; padding: 32px 36px 0; }
+.app-shell .page-heading { margin-bottom: 24px; }
+.app-shell .page-title { margin-top: 7px; }
+.app-shell .page-title-icon { display: none; }
+.app-shell .page-heading h1 { color: #252b24; font-size: 34px; font-weight: 600; letter-spacing: -.035em; }
+.app-shell .page-kicker { color: #6b786a; font-size: 12px; }
+.app-shell .page-heading p:not(.page-kicker) { color: #6a7467; font-size: 14px; margin-top: 10px; }
+.app-shell .page-content { padding-right: 8px; }
+.app-shell .btn { border-radius: 10px; padding: 11px 17px; font-size: 13px; }
+.app-shell .btn-primary { box-shadow: 0 2px 5px #1b3b2b10; }
+.app-shell .btn-primary:hover { box-shadow: 0 3px 9px #1b3b2b18; }
+.app-shell .btn-secondary { border-color: #dedfd5; background: #fff; }
+.app-shell .section-title { font-weight: 600; font-size: 18px; letter-spacing: -.02em; }
+.app-shell .today-progress { padding: 5px 0 20px; margin-bottom: 17px; gap: 34px; border: 0; border-radius: 0; background: transparent; }
+.app-shell .progress-copy { min-width: 215px; }
+.app-shell .progress-copy h2 { font-size: 16px; }
+.app-shell .progress-copy > .muted { font-size: 12px; color: #6c7869; }
+.app-shell .progress-label, .app-shell .progress-total { color: #52644d; }
+.app-shell .progress-visual { flex: 1; width: auto; }
+.app-shell .progress-caption { margin-bottom: 8px; color: #6d7b65; }
+.app-shell .progress-track { height: 7px; background: #e0eddf; }
+.app-shell .progress-track > span { background: #284d37; }
+.app-shell .dashboard-grid { grid-template-columns: minmax(0, 1fr) 278px; gap: 24px; margin-bottom: 26px; }
+.app-shell .habit-list-panel { border: 1px solid #e9e6de; border-radius: 16px; background: #fff; box-shadow: 0 3px 10px #1b3b2b05, 0 1px 2px #1b3b2b04; }
+.app-shell .habit-list-panel > .panel-header { padding: 24px 24px 20px; border: 0; background: #fff; }
+.app-shell .panel-header p { color: #6c7669; font-size: 13px; }
+.app-shell .count-label { padding: 5px 10px; border-radius: 20px; background: #f1efe9; color: #606a5c; }
+.app-shell .habit-list-scroll { max-height: 464px; padding: 0 18px 16px; }
+.app-shell .habit-management-panel .habit-list-scroll { max-height: none; }
+.app-shell .habit-list { display: flex; flex-direction: column; gap: 9px; }
+.app-shell .habit-row { min-height: 106px; padding: 18px 13px; border: 0; border-radius: 12px; background: #f8f7f3; }
+.app-shell .habit-row + .habit-row { border: 0; }
+.app-shell .habit-row:hover { background: #f3f3ed; }
+.app-shell .habit-content h3 { color: #303b2f; font-size: 15px; font-weight: 500; }
+.app-shell .habit-description { color: #6d7769; font-size: 13px; }
+.app-shell .habit-meta { margin-top: 9px; gap: 7px 10px; color: #6c7966; }
+.app-shell .habit-meta .streak { padding: 2px 7px; border-radius: 6px; background: #fbece3; color: #9c502b; font-size: 11px; }
+.app-shell .habit-meta .achievement { color: #4b7353; }
+.app-shell .is-complete .habit-content h3 { text-decoration: line-through; text-decoration-thickness: 1px; text-decoration-color: #87917f; color: #6d7868; }
+.app-shell .habit-check::before { border-color: #cad8ca; border-radius: 6px; background: #fff; }
+.app-shell .habit-check[aria-pressed='true']::before { border-color: #1b3b2b; background: #1b3b2b; }
+.app-shell .habit-check:hover:not(:disabled)::before { border-color: #668a6a; }
+.app-shell .habit-check[aria-pressed='true']:hover::before { background: #2c5139; }
+.app-shell .actions-menu .icon-button { color: #697565; }
+.app-shell .support-column { gap: 20px; }
+.app-shell .week-overview { padding: 24px 23px 17px; border-radius: 16px; background: #1b3b2b; box-shadow: 0 3px 10px #1b3b2b0a; }
+.app-shell .week-overview .panel-header { padding: 0; }
+.app-shell .week-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.app-shell .week-overview .week-kicker { margin: 0 0 7px; color: #bad3bb; font-size: 10px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
+.app-shell .week-overview .section-title { color: #f7faf1; font-size: 17px; }
+.app-shell .week-number { color: #c5ecca; font-size: 37px; font-weight: 600; letter-spacing: -.04em; }
+.app-shell .week-number span { display: none; }
+.app-shell .week-overview > .muted { color: #c2d7be; font-size: 12px; }
+.app-shell .week-bars { margin: 24px 0 14px; height: 109px; gap: 10px; }
+.app-shell .week-bar-track { max-width: 20px; height: 81px; border-radius: 12px; background: #123321; }
+.app-shell .week-bar-track span { background: #a3c9a8; border-radius: 12px; }
+.app-shell .week-day { color: #bdd4ba; font-size: 11px; }
+.app-shell .week-day.current { color: #fff; }
+.app-shell .week-day.current .week-bar-track span { background: #c5ecca; }
+.app-shell .week-overview > .text-button { color: #d2e8c7; font-size: 12px; }
+.app-shell .local-note { padding: 22px 20px 15px; border: 1px solid #e9e6de; border-radius: 16px; background: white; box-shadow: 0 2px 5px #1b3b2b04; }
+.app-shell .local-note > svg { display: block; width: 17px; height: 17px; margin-top: 2px; color: #628364; }
+.app-shell .local-note h2 { color: #354b35; font-size: 15px; font-weight: 500; }
+.app-shell .local-note p { margin-top: 12px; color: #6a7865; font-size: 12px; }
+.app-shell .local-note .text-button { color: #365c3b; font-size: 12px; }
+.app-shell .activity-panel { padding: 26px; border: 1px solid #e9e6de; border-radius: 16px; box-shadow: 0 2px 8px #1b3b2b04; }
+.app-shell .activity-heading .section-title { color: #2e392e; font-size: 20px; font-weight: 600; }
+.app-shell .activity-description { color: #697665; font-size: 13px; }
+.app-shell .activity-year-label { border: 0; border-radius: 10px; background: #f1efe9; }
+.app-shell .activity-metrics { gap: 14px; margin: 25px 0; padding: 0; border: 0; background: transparent; }
+.app-shell .activity-metrics > div { flex-direction: column-reverse; align-items: start; gap: 13px; padding: 19px 17px; border-radius: 12px; background: #f5f3ee; }
+.app-shell .activity-metrics strong { color: #29382c; font-size: 28px; font-weight: 600; }
+.app-shell .activity-metrics span { color: #65725f; font-size: 12px; }
+.app-shell .activity-metrics small { display: block; margin: 3px 0 0; font-size: 10px; }
+.app-shell .activity-metrics strong svg { color: #ba7149; width: 16px; }
+.app-shell .activity-level-0 { background: #eceae4; }
+.app-shell .activity-level-1 { background: #d9e6dc; }
+.app-shell .activity-level-2 { background: #a3c9a8; }
+.app-shell .activity-level-3 { background: #62886a; }
+.app-shell .activity-level-4 { background: #1b3b2b; }
+.app-shell .activity-cell { border-radius: 3px; }
+.app-shell .settings-section, .app-shell .calendar-panel, .app-shell .calendar-details,
+.app-shell .statistics-page > .panel, .app-shell .insights-report > .panel,
+.app-shell .insights-charts > .panel { border-radius: 16px; border-color: #e5e2da; box-shadow: 0 2px 8px #1b3b2b04; }
+.app-shell .statistics-metrics { background: #1b3b2b; }
+.app-shell .settings-section:first-child { border-top-color: #a3c9a8; }
+.app-shell .settings-section + .settings-section { border-top-color: #c8a17b; }
+.app-shell .insights-report-intro { background: #edf1e8; border-color: #dde5d6; border-radius: 12px; }
+.app-shell .status-note { border-radius: 10px; }
+.app-shell .content-footer { padding-block: 14px; color: #6e7a65; }
+.app-shell .navigation-dialog .dialog-surface { background: #1b3b2b; color: #f2f8ed; border: 0; }
+.app-shell .navigation-dialog .dialog-heading h2 { color: #f2f8ed; }
+.app-shell .navigation-dialog .dialog-heading .icon-button { color: #c5ecca; }
+.app-shell .navigation-dialog .dialog-heading .icon-button:hover { background: #284d37; }
+.app-shell .navigation-dialog .drawer-note { color: #bdd2bf; border-color: #385341; }
+.auth-newsprint { --primary: #1b3b2b; --primary-hover: #102c1d; --primary-soft: #d9e6dc; --background: #f9f7f2; --border: #e5e2da; }
+.auth-newsprint .auth-editorial { background: #1b3b2b; border-radius: 20px; box-shadow: 0 5px 16px #1b3b2b0a; }
+.auth-newsprint .auth-card { max-width: 440px; padding: 30px; border: 1px solid #e9e5db; border-radius: 18px; background: #fff; box-shadow: 0 3px 12px #1b3b2b05; }
+.auth-newsprint .auth-submit, .auth-newsprint .auth-form input { border-radius: 9px; }
+.auth-newsprint .auth-tabs button[aria-selected='true'] { color: #1b3b2b; }
+@media (max-width: 1199px) {
+  .app-shell { grid-template-columns: 204px minmax(0, 1fr); }
+  .app-shell .main-content { padding: 28px 28px 0; }
+  .app-shell .topbar { padding-inline: 28px; }
+  .app-shell .brand { font-size: 16px; padding-inline: 7px; }
+  .app-shell .dashboard-grid { grid-template-columns: minmax(0, 1fr) 225px; gap: 20px; }
+  .app-shell .week-header { align-items: start; flex-direction: column; gap: 16px; }
+  .app-shell .week-number { font-size: 34px; }
+  .app-shell .habit-row { padding-inline: 9px; }
+  .app-shell .activity-metrics > div { padding: 17px 14px; }
+}
+@media (max-width: 959px) {
+  .app-shell { display: block; }
+  .app-shell .sidebar { display: none; }
+  .app-shell .main-content { max-width: 960px; }
+}
+@media (max-width: 680px) {
+  .app-shell .main-content { padding: 24px 16px 0; }
+  .app-shell .topbar { padding-inline: 18px; }
+  .app-shell .page-heading h1 { font-size: 30px; }
+  .app-shell .page-heading p:not(.page-kicker) { font-size: 13px; }
+  .app-shell .today-progress { gap: 15px; padding-bottom: 18px; margin-bottom: 16px; }
+  .app-shell .progress-visual { width: 100%; flex: auto; }
+  .app-shell .dashboard-grid { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .app-shell .habit-list-panel > .panel-header { padding: 21px 19px 17px; }
+  .app-shell .habit-list-scroll { max-height: 410px; padding: 0 10px 12px; }
+  .app-shell .habit-management-panel .habit-list-scroll { max-height: none; }
+  .app-shell .habit-row { min-height: 105px; padding: 17px 8px; }
+  .app-shell .habit-content h3 { font-size: 14px; }
+  .app-shell .habit-description { font-size: 12px; }
+  .app-shell .habit-meta { font-size: 11px; }
+  .app-shell .support-column { grid-template-columns: minmax(0, 1fr); }
+  .app-shell .week-header { flex-direction: row; align-items: center; }
+  .app-shell .local-note { padding: 21px; }
+  .app-shell .activity-panel { padding: 22px 18px; }
+  .app-shell .activity-metrics { gap: 11px; }
+  .app-shell .activity-metrics > div { padding: 16px 13px; }
+  .app-shell .activity-metrics strong { font-size: 25px; }
+  .app-shell .page-heading .btn { min-height: 42px; padding-inline: 13px; }
+  .auth-newsprint .auth-card { padding: 25px; }
+}
+@media (max-height: 650px) { .app-shell .main-content { padding-top: 18px; } }
+
+/* Reference-layout adaptation: profile rail, overview tiles and a panelled board.
+   The existing forest/ivory palette and viewport scrolling are preserved. */
+.app-shell .sidebar { padding: 23px 14px 20px; }
+.app-shell .sidebar-profile { display: flex; align-items: center; gap: 10px; padding: 19px 11px; margin-top: 23px; border: 1px solid #355942; border-radius: 13px; background: #244b35; }
+.app-shell .sidebar-profile .account-avatar { width: 39px; height: 39px; flex-shrink: 0; border: 3px solid #d1e7cc; background: #f2f6ec; color: #35553a; }
+.app-shell .sidebar-profile > div { min-width: 0; }
+.app-shell .sidebar-profile strong { display: block; overflow: hidden; color: #f6faef; font-size: 12px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.app-shell .sidebar-profile div > span { display: block; overflow: hidden; margin-top: 5px; color: #c2d7c1; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.app-shell .sidebar nav { margin-top: 24px; }
+.app-shell .sidebar-sync { display: flex; align-items: center; gap: 9px; margin-top: auto; padding: 24px 9px 0; color: #bed4bd; font-size: 11px; }
+.app-shell .overview-section { padding: 19px 21px 22px; margin-bottom: 22px; border: 1px solid #e3e5d9; border-radius: 14px; background: #eef2e6; }
+.app-shell .overview-section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; margin-bottom: 16px; }
+.app-shell .overview-section-heading h2 { color: #3d5138; font-size: 15px; font-weight: 600; letter-spacing: -.015em; }
+.app-shell .overview-section-heading > span { color: #6a7860; font-size: 11px; }
+.app-shell .overview-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; }
+.app-shell .overview-metric { display: flex; align-items: start; gap: 13px; padding: 17px 14px; border: 1px solid #dfe5d6; border-radius: 10px; background: #fff; box-shadow: 0 2px 4px #23432b03; }
+.app-shell .overview-metric > div { min-width: 0; }
+.app-shell .overview-metric-icon { display: grid; width: 38px; height: 38px; flex-shrink: 0; place-items: center; border: 1px solid #d3dfca; border-radius: 9px; background: #e7efdf; color: #476541; }
+.app-shell .overview-metric-mint .overview-metric-icon { background: #e4f0e7; border-color: #ccdfd1; color: #4e7862; }
+.app-shell .overview-metric-olive .overview-metric-icon { background: #f0f1dc; border-color: #dfe2bf; color: #7c804a; }
+.app-shell .overview-metric-warm .overview-metric-icon { background: #f8ebdf; border-color: #ead9c8; color: #a07348; }
+.app-shell .overview-metric-label { display: block; margin-bottom: 6px; color: #6c7864; font-size: 11px; line-height: 1.5; }
+.app-shell .overview-metric strong { display: block; color: #2d3c2d; font-size: 27px; font-weight: 600; letter-spacing: -.025em; line-height: 1.15; }
+.app-shell .overview-metric strong small { font-size: 12px; font-weight: 400; letter-spacing: 0; }
+.app-shell .overview-metric-note { display: block; margin-top: 7px; color: #77816d; font-size: 10px; line-height: 1.6; }
+.app-shell .dashboard-reference-grid { grid-template-columns: minmax(0, 1fr) 278px; align-items: start; gap: 22px; }
+.app-shell .dashboard-primary { display: flex; flex-direction: column; gap: 21px; min-width: 0; }
+.app-shell .dashboard-primary .today-progress { display: flex; flex-direction: row; align-items: center; justify-content: space-between; min-height: 178px; gap: 30px; padding: 25px 28px; margin: 0; border: 1px solid #e5e4da; border-radius: 14px; background: white; box-shadow: 0 2px 6px #23432b04; }
+.app-shell .progress-eyebrow { margin-bottom: 12px; color: #617357; font-size: 12px; font-weight: 500; }
+.app-shell .dashboard-primary .progress-copy h2 { font-size: 22px; }
+.app-shell .dashboard-primary .progress-copy h2 > .numeric { color: #2a5032; font-size: 27px; }
+.app-shell .dashboard-primary .progress-label { display: block; margin: 7px 0 0; color: #607159; font-size: 13px; }
+.app-shell .dashboard-primary .progress-visual { flex: 0 0 112px; width: 112px; }
+.app-shell .progress-ring { position: relative; width: 112px; height: 112px; }
+.app-shell .progress-ring > svg { display: block; width: 100%; height: 100%; transform: rotate(-90deg); }
+.app-shell .progress-ring circle { fill: none; stroke-width: 12px; }
+.app-shell .progress-ring-track { stroke: #eaf0e2; }
+.app-shell .progress-ring-fill { stroke: #6d9565; stroke-linecap: round; transition: stroke-dashoffset 180ms; }
+.app-shell .progress-ring > strong { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #42633e; font-size: 21px; font-weight: 500; }
+.app-shell .dashboard-reference-grid .habit-list-scroll { max-height: 410px; }
+.app-shell .dashboard-reference-grid .week-overview { min-height: 288px; }
+.app-shell .dashboard-reference-grid .week-bars { height: 116px; margin-top: 26px; }
+.app-shell .dashboard-reference-grid .week-bar-track { height: 88px; }
+.app-shell .dashboard-reference-grid .local-note { min-height: 156px; }
+@media (max-width: 1199px) {
+  .app-shell .overview-metrics { gap: 10px; }
+  .app-shell .overview-metric { gap: 10px; padding: 16px 12px; }
+  .app-shell .overview-metric-icon { width: 31px; height: 31px; }
+  .app-shell .overview-metric-icon > svg { width: 18px; }
+  .app-shell .overview-metric strong { font-size: 24px; }
+  .app-shell .overview-metric-note { display: none; }
+  .app-shell .dashboard-reference-grid { grid-template-columns: minmax(0, 1fr) 225px; gap: 20px; }
+  .app-shell .dashboard-primary .today-progress { padding: 24px; }
+}
+@media (max-width: 760px) {
+  .app-shell .overview-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .app-shell .overview-metric-note { display: block; }
+  .app-shell .overview-section { padding: 18px; }
+  .app-shell .overview-section-heading > span { display: none; }
+}
+@media (max-width: 680px) {
+  .app-shell .dashboard-reference-grid { grid-template-columns: minmax(0, 1fr); }
+  .app-shell .dashboard-primary .today-progress { gap: 15px; padding: 23px 21px; }
+  .app-shell .dashboard-primary .progress-copy { min-width: 0; }
+  .app-shell .dashboard-primary .progress-copy h2 { font-size: 20px; }
+  .app-shell .dashboard-primary .progress-visual { flex-basis: 96px; width: 96px; }
+  .app-shell .progress-ring { width: 96px; height: 96px; }
+  .app-shell .dashboard-reference-grid .support-column { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 380px) {
+  .app-shell .overview-metric { padding: 14px 10px; gap: 8px; }
+  .app-shell .overview-metric-icon { display: none; }
+  .app-shell .dashboard-primary .progress-visual { flex-basis: 84px; width: 84px; }
+  .app-shell .progress-ring { width: 84px; height: 84px; }
+}
+
+/* Habits page: the page itself scrolls, not the list. The list is paginated (10 per page) in HabitList.jsx. */
+.app-shell .page-content-habits { display: block; overflow-y: auto; overflow-x: hidden; padding-bottom: 24px; }
+.app-shell .page-content-habits .habit-management-panel { flex: none; min-height: auto; }
+.app-shell .page-content-habits .habit-management-panel .habit-list-scroll { flex: none; max-height: none; overflow: visible; }
+.app-shell .habit-pagination { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 20px; padding: 14px 24px 18px; border-top: 1px solid #eeece5; }
+.app-shell .habit-pagination-summary { color: #6c7669; font-size: 12px; }
+.app-shell .habit-pagination-controls { display: flex; align-items: center; gap: 12px; }
+.app-shell .habit-pagination-page { min-width: 92px; color: #4b5a47; font-size: 13px; font-variant-numeric: tabular-nums; text-align: center; }
+.app-shell .habit-pagination .btn { min-height: 38px; padding: 7px 13px; }
+@media (max-width: 680px) {
+  .app-shell .habit-pagination { justify-content: center; padding: 14px 12px 16px; }
+  .app-shell .habit-pagination-summary { width: 100%; text-align: center; }
+}
+
+/* Header actions (refresh + add) and a slim risk-estimate status line. */
+.app-shell .page-actions { display: flex; align-items: center; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.app-shell .page-actions .btn { white-space: nowrap; }
+.app-shell .spin-icon { animation: spin 800ms linear infinite; }
+.habit-form .settings-row .field-label, .habit-form .settings-row .form-hint { display: block; }
+.habit-form .settings-row .form-hint { margin-top: 2px; line-height: 1.5; }
+.app-shell .prediction-notice { display: block; padding: 7px 12px; margin-bottom: 14px; border-radius: 8px; font-size: 12px; line-height: 1.5; }
+@media (max-width: 680px) {
+  .app-shell .page-heading:has(.page-actions) { flex-wrap: wrap; }
+  .app-shell .page-actions { width: 100%; justify-content: flex-start; }
+}

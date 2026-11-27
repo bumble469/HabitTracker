@@ -1,191 +1,129 @@
-# 🌟 Habit Tracker Web App
+# Habit Tracker: Behaviour Insights & AI Coach
 
-A beautiful, modern web application to track your daily habits with gamification elements, built with React and Vite. All data is stored locally in your browser using localStorage, ensuring privacy and offline functionality.
+A habit workspace built with React and Vite. Plan daily routines, save check-ins to your account, and understand your consistency through activity calendars, streaks, and optional AI predictions.
 
-🌐 **[Live Demo](https://theunknown550.github.io/Habit-Tracker-Web-App/)** - Try it now!
+[Published project demo](https://theunknown550.github.io/Habit-Tracker-Web-App/) · [Installation guide](INSTALLATION.md) · [Frontend implementation handoff](FRONTEND_HANDOFF.md)
 
-![Habit Tracker Demo](./demo.gif) <!-- Placeholder for demo GIF -->
+The published demo may differ from the branch you run locally. The Coach is a future backend integration; a conversation feature is not implemented in this frontend.
 
-## 📋 Table of Contents
+## Features and navigation
 
-- [✨ Features](#-features)
-- [🛠️ Tech Stack](#️-tech-stack)
-- [🚀 Quick Start](#-quick-start)
-- [📚 Documentation](#-documentation)
-- [🌐 Deployment](#-deployment)
-- [🎮 Usage](#-usage)
-- [📈 Gamification Features](#-gamification-features)
-- [🏗️ Project Structure](#️-project-structure)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
-- [🙏 Acknowledgements](#-acknowledgements)
+The home URL always opens a public project introduction, with feature explanations, interface illustrations, a captioned video walkthrough, and FAQs. It does not show invented account totals or load personal activity. **Get started** opens `/app` with Log in and Sign up available. Successful login or registration always opens the normal workspace at `/app`; logout returns to the landing page. Desktop uses a labeled sidebar; smaller screens use a modal navigation drawer. The workspace fits the viewport: headings and controls stay visible, page content scrolls inside its pane, and My Habits has an independently scrollable list with a fixed header.
 
-## ✨ Features
+| Tab | Purpose |
+| --- | --- |
+| Overview | Four account-derived summary tiles, today’s completion ring and habits, a seven-day summary, and annual activity. |
+| My habits | Create, edit, check in, and confirm deletion of habits and their history. |
+| Activity | Annual contribution calendar plus monthly history and per-day habit details. |
+| Statistics | Habit totals, active habits, current streaks, monthly completion, top habits, and the last 14 days. |
+| Insights | Weekly consistency, weekday completion, per-habit drop-off comparisons, and optional ranked risk predictions for tomorrow. |
+| Settings | Control optional AI predictions and browser notifications. |
 
-- **🎨 Beautiful UI**: Modern design with gradients, animations, and smooth transitions
-- **🎯 Add, Edit, and Delete Habits**: Easily manage your habit list with an intuitive interface
-- **✅ Daily Checklist**: Interactive habit completion with celebratory animations
-- **🔥 Streak Tracking**: View your current streak for each habit with achievement badges
-- **📊 Progress Visualization**: Animated progress bar with color-coded completion levels
-- **📅 Calendar View**: Monthly calendar showing habit completion history with visual indicators
-- **📈 Statistics Dashboard**: Comprehensive analytics including completion rates, top habits, and progress charts
-- **💾 Data Management**: Export/import habit data and clear all data with backup functionality
-- **🎉 Motivational Messages**: Dynamic encouragement based on your progress percentage
-- **🎭 Random Icons**: Each habit gets a fun emoji icon for better visual organization
-- **💾 Local Storage**: All data persists between sessions without needing a backend
-- **📱 Responsive Design**: Works seamlessly on desktop and mobile devices
-- **⚡ Smooth Animations**: Fade-in effects, hover animations, and completion celebrations
+Backup import, export, and clear-data tools are hidden from navigation and Settings. To use them for testing, sign in normally, then deliberately open `/pratik`. It is never the automatic post-login destination. On the existing GitHub Pages deployment, this is `/Habit-Tracker-Web-App/pratik/`. The production build includes physical `/app/` and `/pratik/` entries so these links work without a server-side routing fallback.
 
-## Tech Stack
+The sign-up form requires at least 8 characters, a capital letter, a number, and a symbol. A live checklist shows each requirement, and invalid registration passwords are rejected before an API request. Existing account login passwords remain accepted. These are frontend form checks; the authentication API and backend code are unchanged.
 
-- **Frontend**: React 19.1.1 with Vite for fast development and building
-- **Styling**: TailwindCSS 4.1.14 for modern, utility-first CSS with custom animations
-- **Data Storage**: Browser localStorage (no backend required)
-- **Language**: JavaScript (ES6+)
-- **Icons**: Unicode emojis for cross-platform compatibility
+The activity calendar uses neutral squares for days with no check-ins and progressively deeper green for 1, 2, 3, and 4 or more completions. Check-in totals and active days refer to the selected year; current and longest streaks span all saved history. An active day requires at least one completed habit. Streaks count consecutive calendar days, and an unfinished today keeps a streak through yesterday. Dates follow the account timezone.
 
-## 🚀 Quick Start
+Habit opportunities respect creation dates and imported weekday schedules. Charts exclude future dates and show eligible opportunities as their denominator. Insights includes accessible data tables and a working 4/8/12-calendar-week selector. The current week ends today. Drop-off comparisons use two fixed 14-day windows and show an insufficient-history state when a comparison is not supported.
 
-Get started with the Habit Tracker in just a few minutes!
+## Stack
+
+- React 19 and JavaScript, using the existing state and tab-navigation approach.
+- Vite 7 and npm, with `package-lock.json` retained.
+- Tailwind CSS 4 and shared semantic CSS tokens.
+- Recharts 3.11 for analytical charts.
+- Lucide React icons and locally bundled Inter, with system-font fallbacks.
+- Vitest and jsdom for calculation, request-layer, hook, and interaction tests.
+- Account-backed habit and completion APIs, with browser session storage for sign-in.
+
+## Local development
+
+Use Node.js **22.22.2 or newer** with npm. The installed test environment reports an engine warning on the development host’s Node 22.22.1; tests still ran there.
 
 ```bash
-git clone https://github.com/TheUnknown550/Habit-Tracker-Web-App.git
-cd Habit-Tracker-Web-App
-npm install
+npm ci
 npm run dev
 ```
 
-Then open `http://localhost:5173` in your browser.
+Open the Vite URL printed in the terminal, normally `http://localhost:5173/Habit-Tracker-Web-App/`.
 
-📖 **Detailed Installation Guide**: See [INSTALLATION.md](INSTALLATION.md) for comprehensive setup instructions, troubleshooting, and alternative installation methods.
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start Vite development server. |
+| `npm run lint` | Run ESLint. |
+| `npm test` | Run Vitest once. |
+| `npm run build` | Build static assets into `dist/`. |
+| `npm run preview` | Serve the production build locally. |
 
-## 📚 Documentation
+See [INSTALLATION.md](INSTALLATION.md) for the contributed installation and deployment guide. Use the Node version and npm workflow above for the current dependency set.
 
-- **[INSTALLATION.md](INSTALLATION.md)** - Complete installation and setup guide
-- **[README.md](README.md)** - Project overview, features, and usage (this file)
+## Optional AI configuration and privacy
 
-## 🌐 Deployment
+Copy the public URL setting from [.env.example](.env.example) into `.env.local`:
 
-This app is automatically deployed to GitHub Pages using GitHub Actions.
-
-**Live Demo**: [https://theunknown550.github.io/Habit-Tracker-Web-App/](https://theunknown550.github.io/Habit-Tracker-Web-App/)
-
-### Automatic Deployment
-
-Every push to the `main` branch triggers an automatic deployment:
-1. GitHub Actions builds the app using `npm run build`
-2. The built files are deployed to GitHub Pages
-3. Your site is live within 2-3 minutes!
-
-### Manual Deployment
-
-You can also trigger a deployment manually:
-1. Go to the **Actions** tab in your GitHub repository
-2. Select the **Deploy to GitHub Pages** workflow
-3. Click **Run workflow**
-
-### Setup GitHub Pages (First Time)
-
-If you fork this repository, enable GitHub Pages:
-1. Go to your repository **Settings**
-2. Navigate to **Pages** (under "Code and automation")
-3. Under **Source**, select **GitHub Actions**
-4. The next push to `main` will deploy automatically!
-
-See [INSTALLATION.md](INSTALLATION.md#deploying-to-github-pages) for more deployment options.
-
-## 🎮 Usage
-
-The app features four main sections accessible via the navigation tabs at the top:
-
-### 🎯 Habits Tab
-1. **Adding a Habit**: Use the beautiful "Add New Habit" form to create a new habit. Each habit automatically gets a fun emoji icon!
-
-2. **Tracking Progress**: Click the circular icon next to each habit to mark it as completed. Watch the celebratory animation and see your progress bar update in real-time!
-
-3. **Viewing Streaks**: See your current streak displayed below each habit name. Earn achievement badges for 7+ day and 30+ day streaks! 🔥⭐👑
-
-4. **Editing Habits**: Click the "✏️ Edit" button next to a habit to modify its name or description.
-
-5. **Deleting Habits**: Click the "🗑️ Delete" button to remove a habit from your list.
-
-### 📅 Calendar Tab
-- View your habit completion history in a monthly calendar format
-- Green dots: All habits completed that day
-- Yellow dots: Some habits completed that day
-- Gray dots: No habits completed that day
-- Navigate between months and jump back to today
-
-### 📊 Statistics Tab
-- **Key Metrics**: Total habits, active habits, longest streak, monthly completion rate
-- **Top Performing Habits**: See which habits you complete most consistently
-- **Progress Charts**: Visual representation of your last 14 days of habit completion
-
-### 💾 Data Tab
-- **Export Data**: Download your habits and progress as a JSON backup file
-- **Import Data**: Upload a previously exported backup to restore your data
-- **Clear All Data**: Permanently remove all habits and completion history
-
-## 📈 Gamification Features
-
-- **🎯 Achievement Badges**: Special indicators for impressive streaks
-- **🎨 Dynamic Progress Colors**: Progress bar changes color based on completion percentage
-- **✨ Celebration Animations**: Satisfying animations when completing habits
-- **💬 Motivational Messages**: Context-aware encouragement throughout your journey
-- **🎭 Visual Icons**: Each habit gets a unique emoji for better visual organization
-
-## Project Structure
-
+```dotenv
+VITE_API_BASE_URL=http://localhost:8000
 ```
+
+Restart Vite after changing it. Enable **AI predictions** in Settings only when you want requests sent to that backend. `VITE_` variables are public client configuration: never put database credentials, Gemini keys, or other secrets there.
+
+When enabled, the frontend sends `POST /predict` with the habit ID, local creation date, today’s local date, and recorded completion dates. Habit names and descriptions are not included. Valid backend probabilities, levels, and reasons are displayed for the chance of missing **tomorrow**. No frontend probability thresholds or fake predictions are used.
+
+AI starts **off** and its preference persists separately from habit data. With AI off, the shared request layer blocks AI calls, queued work, and retries; no automatic health probe runs. Turning AI off aborts in-flight work where possible and ignores late results. It cannot recall information already transmitted.
+
+Missing configuration, timeouts, invalid responses, and a backend outage produce explicit unavailable states and a retry action when enabled. Check-ins, calendar, statistics, local charts, and backups remain usable. A FastAPI implementation and live contract verification are not included in this repository; see the [handoff](FRONTEND_HANDOFF.md) for questions for the backend owner.
+
+## Account data and the landing-page example
+
+Habits and check-ins are loaded from the signed-in account. Completion history is an object keyed by habit ID, with `YYYY-MM-DD` date arrays. Browser-local legacy habit data is not used as account history.
+
+The landing page does not display a sample personal dashboard or synthetic activity totals. It explains the real workflow using original SVG interface illustrations and a 24-second animated product walkthrough, explicitly labeled as illustrations with no account data. This is authored media, not a browser recording or screenshots of an account. The walkthrough has native video controls, English captions, a transcript, and no autoplay. Rebuild the media with `python3 scripts/build-landing-media.py` (requires FFmpeg with librsvg and libx264). Real accounts start with their own habits. Account backups remain available only through the hidden `/pratik` route; import and clear actions retain their confirmation dialogs.
+
+The public landing page needs no backend connection. Sign-in, account tracking, notifications, and predictions require their configured services. The notification service worker is not an offline application cache.
+
+## Project structure
+
+```text
 src/
-├── components/
-│   ├── AddHabitForm.jsx       # Form for adding new habits
-│   ├── CalendarView.jsx       # Monthly calendar with completion history
-│   ├── DataExport.jsx         # Data management (export/import/clear)
-│   ├── HabitItem.jsx          # Individual habit component
-│   ├── HabitList.jsx          # List of all habits
-│   ├── ProgressBar.jsx        # Daily progress visualization
-│   └── StatisticsDashboard.jsx # Analytics and statistics
+├── App.jsx                    # Shared shell, tabs, local state, data replacement
+├── components/                # Habit UI, dialogs, reports, calendar, settings
 ├── hooks/
-│   └── useLocalStorage.js     # Custom hook for localStorage persistence
-├── App.jsx                    # Main application with tab navigation
-├── index.css                  # Global styles with Tailwind imports
-└── main.jsx                   # Application entry point
-public/                        # Static assets (currently empty)
+│   ├── useLocalStorage.js     # Original keys, functional updates, save feedback
+│   ├── useLocalDate.js        # Local midnight/focus date refresh
+│   └── usePredictions.js      # Cancellation, concurrency, snapshot invalidation
+├── services/predictionApi.js  # Shared opt-in gate, timeout, response validation
+├── utils/insights.js          # Pure local-date, eligibility, reporting, risk helpers
+├── utils/statistics.js        # Existing statistics using eligible opportunities
+├── data/demoData.js           # Synthetic frontend demo fixture
+├── data/backup.js             # JSON backup validation
+└── index.css                  # Shared design tokens and responsive shell
 ```
+
+Tests sit beside their components, hooks, services, and helpers. See [FRONTEND_HANDOFF.md](FRONTEND_HANDOFF.md) for file responsibilities, requirement mapping, verification evidence, and a short demo sequence.
+
+## Deployment
+
+The existing [GitHub Pages workflow](.github/workflows/deploy.yml) builds with `npm ci` and `npm run build`, then uploads `dist/`. It runs on pushes to `main` and through a manual workflow dispatch.
+
+To configure a fork, open repository **Settings → Pages** and choose **GitHub Actions** as the source. To run an approved deployment manually, open **Actions → Deploy to GitHub Pages → Run workflow**. Follow its status in Actions. See [INSTALLATION.md](INSTALLATION.md#deploying-to-github-pages) for additional deployment instructions.
+
+Vite retains the `/Habit-Tracker-Web-App/` base path. Adjust that existing configuration only when intentionally changing the hosting path. A deployed AI backend needs HTTPS and CORS permission for the frontend origin; configure the public build-time API URL in the deployment environment if predictions are wanted.
 
 ## Contributing
 
-Contributions are welcome! This project is open-source and beginner-friendly. Here's how you can contribute:
+Preserve the existing JavaScript, npm, tab navigation, and browser-local storage model. Keep backend, model, database, and training-data work with the backend owner. Run lint, tests, and a production build for changes; review your branch and diff before committing or publishing.
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/your-feature-name`
-3. Make your changes and test them
-4. Commit your changes: `git commit -m 'Add some feature'`
-5. Push to the branch: `git push origin feature/your-feature-name`
-6. Open a Pull Request
+Useful future work includes backend schema agreement, a verified Coach contract, optional schedule editing, and offline launch support. The current frontend does not claim backend model validation or evaluation.
 
-### Ideas for Contributions
+## License and references
 
-- **🌙 Dark Mode**: Toggle between light and dark themes for better user experience
-- **� PWA Features**: Progressive Web App capabilities for mobile installation
-- **🔔 Browser Notifications**: Optional reminders for habit completion times
-- **📊 Advanced Analytics**: Trend analysis, habit correlations, and predictive insights
-- **� Habit Categories**: Group habits by categories (Health, Productivity, Learning, etc.)
-- **📤 Data Export Options**: Export to CSV, PDF reports, or shareable formats
-- **🔄 Habit Templates**: Pre-built habit collections for common goals
-- **👥 Social Features**: Share achievements and compete with friends
-- **🎵 Sound Effects**: Customizable audio feedback for habit completions
-- **� Weekly/Monthly Goals**: Set and track completion targets
-- **🔥 Streak Challenges**: Community challenges and streak competitions
-- **� Habit Insights**: AI-powered suggestions for habit improvement
+The project uses the [MIT License](LICENSE). The redesign uses original application code; reference implementations were inspected for layout and interaction guidance without copying their source or adding a second chart framework.
 
-## License
+- [React](https://react.dev/), [Vite](https://vite.dev/), and [Tailwind CSS](https://tailwindcss.com/).
+- [shadcn/ui source](https://github.com/shadcn-ui/ui), [Vite installation guidance](https://ui.shadcn.com/docs/installation/vite), and [dashboard blocks](https://ui.shadcn.com/blocks/dashboard).
+- [Radix Dialog behavior](https://www.radix-ui.com/primitives/docs/components/dialog).
+- [Tremor source](https://github.com/tremorlabs/tremor) as an analytics presentation reference.
+- [Recharts 3 API](https://recharts.github.io/en-US/api/) and [Lucide React](https://lucide.dev/guide/react).
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgements
-
-- Built with [Vite](https://vitejs.dev/) and [React](https://react.dev/)
-- Styled with [TailwindCSS](https://tailwindcss.com/)
-- Inspired by various habit tracking apps for a simple, effective approach
+Bundled font and icon license notices are included in [public/licenses](public/licenses/) and in production builds. UI references and implementation notes are listed in [FRONTEND_HANDOFF.md](FRONTEND_HANDOFF.md).

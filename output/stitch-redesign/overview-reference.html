@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><title>Habit Tracker</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"tertiary-container":"#602100","on-primary-fixed":"#002113","surface-container-low":"#f5f3ee","error":"#ba1a1a","surface":"#fbf9f4","on-secondary-fixed-variant":"#2c4e35","on-primary-fixed-variant":"#2d4d3c","surface-bright":"#fbf9f4","on-tertiary-container":"#e68459","surface-container-highest":"#e4e2dd","tertiary":"#3d1200","primary":"#032517","on-surface":"#1b1c19","secondary-fixed":"#c5ecca","inverse-on-surface":"#f2f1ec","outline":"#727973","error-container":"#ffdad6","secondary-fixed-dim":"#aad0af","surface-dim":"#dbdad5","secondary":"#44664b","on-tertiary":"#ffffff","outline-variant":"#c1c8c2","on-primary":"#ffffff","surface-container-high":"#eae8e3","surface-tint":"#456553","primary-fixed-dim":"#abcfb8","primary-fixed":"#c7ebd4","surface-container-lowest":"#ffffff","on-secondary":"#ffffff","primary-container":"#1b3b2b","on-secondary-container":"#486a4f","on-surface-variant":"#424843","background":"#fbf9f4","on-primary-container":"#83a590","on-error-container":"#93000a","on-background":"#1b1c19","inverse-surface":"#30312e","on-secondary-fixed":"#00210c","surface-container":"#f0eee9","tertiary-fixed":"#ffdbcd","tertiary-fixed-dim":"#ffb597","on-error":"#ffffff","surface-variant":"#e4e2dd","on-tertiary-fixed":"#360f00","secondary-container":"#c2e9c7","inverse-primary":"#abcfb8","on-tertiary-fixed-variant":"#79310c"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-lg":"1.5rem","space-sm":"0.5rem","space-xs":"0.25rem","space-xl":"2rem","margin":"2rem","gutter":"1.5rem","space-md":"1rem"},"fontFamily":{"display-lg":["Inter"],"stat-lg":["Inter"],"label-md":["Inter"],"body-lg":["Inter"],"headline-md":["Inter"],"body-md":["Inter"],"label-lg":["Inter"],"headline-sm":["Inter"],"stat-sm":["Inter"],"headline-lg":["Inter"]},"fontSize":{"display-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"600"}],"stat-lg":["28px",{"lineHeight":"34px","letterSpacing":"-0.02em","fontWeight":"600"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.01em","fontWeight":"500"}],"body-lg":["15px",{"lineHeight":"22px","fontWeight":"400"}],"headline-md":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"label-lg":["13px",{"lineHeight":"18px","fontWeight":"500"}],"headline-sm":["17px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"600"}],"stat-sm":["15px",{"lineHeight":"20px","fontWeight":"600"}],"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}]}}}};</script></head><body class="bg-surface font-body-md text-body-md text-on-surface"><aside class="fixed left-0 top-0 h-full w-56 bg-primary-container z-50 flex flex-col justify-between py-space-lg"><div class="px-space-md"><div class="flex items-center gap-space-sm px-space-sm mb-space-xl"><span class="material-symbols-outlined text-secondary-fixed text-xl">spa</span><span class="font-headline-sm text-headline-sm text-on-primary tracking-tight">Habit Tracker</span></div><nav class="flex flex-col gap-space-xs" data-active-classes="bg-secondary-fixed text-on-secondary-fixed font-semibold rounded-lg"><a aria-current="page" class="flex items-center gap-space-sm px-space-sm py-space-sm transition-colors bg-secondary-fixed text-on-secondary-fixed font-semibold rounded-lg" data-path="overview" href="#"><span class="material-symbols-outlined text-lg">grid_view</span>Overview</a><a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg font-label-lg text-label-lg text-on-primary-container hover:bg-primary hover:text-on-primary transition-colors" data-path="my-habits" href="#"><span class="material-symbols-outlined text-lg">check_circle</span>My habits</a><a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg font-label-lg text-label-lg text-on-primary-container hover:bg-primary hover:text-on-primary transition-colors" data-path="activity" href="#"><span class="material-symbols-outlined text-lg">calendar_today</span>Activity</a><a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg font-label-lg text-label-lg text-on-primary-container hover:bg-primary hover:text-on-primary transition-colors" data-path="statistics" href="#"><span class="material-symbols-outlined text-lg">bar_chart</span>Statistics</a><a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg font-label-lg text-label-lg text-on-primary-container hover:bg-primary hover:text-on-primary transition-colors" data-path="insights" href="#"><span class="material-symbols-outlined text-lg">lightbulb</span>Insights</a><a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg font-label-lg text-label-lg text-on-primary-container hover:bg-primary hover:text-on-primary transition-colors" data-path="settings" href="#"><span class="material-symbols-outlined text-lg">settings</span>Settings</a></nav></div><div class="px-space-md"><div class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg bg-primary/50"><div class="w-8 h-8 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed font-label-md text-label-md font-semibold">JD</div><div class="flex flex-col min-w-0"><span class="font-label-lg text-label-lg text-on-primary truncate">Jordan Vance</span><span class="font-label-md text-label-md text-on-primary-container truncate">Personal Plan</span></div></div></div></aside><div class="pl-56"><header class="fixed top-0 left-56 right-0 h-14 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40"><div class="h-14 w-full px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><img alt="Habit Tracker Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/ALJJyrCbJRtzA4Bq1a0Y49rku_9NFEnsqzgBdhanYi6nq7NP-qLhRlTayZw3swkLar93W_jVxmlELibe39J05g2bLG6AWqmtWWIvGqu1O_Jg4ZTTXp7KKjI61GOAw4hdAfF31IK-xbDfGJ6GtU1P7BfXuPMCo07g1d_CunHdhMK_x2JP9kIB6lhTLFwsHGfj6272mCKyjP1dKcMMwIQqx_U5woGfAyMiNdt6oJVbfctrc4Y"/><span class="font-headline-sm text-headline-sm text-on-surface">Habit Tracker</span></div><div class="flex items-center gap-space-md"><button aria-label="Notifications" class="p-space-xs rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-xl">notifications</span></button><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCW6oSf5P3WyC2MJimJsh1Pp23Q57qulSrvrTD6nKRi6v4R2NMoC3OkoWCPqpC0UJ03DLpFhQDssomLP3vOMp8uebJ7p8L9We7gw--jZKBwYx2IEpzYf1cQCQHo4Fd9LI8B-FBlrJ4oqHyuFgTi3CSi-YHyACFSdCgGuyTf4uW9uPgSt9TTxggrqlm1IngfpbInQxIfSKeASHq-O3vH_p18idSLJh2Q1qac1OX5ibTJlcBVCKNKJYaENOVT0If0w"/></div></div></header><main class="w-full pt-14 px-margin bg-surface"><div class="flex flex-col w-full pb-space-xl">
+<!-- Sticky Page Header & Daily Progress Summary -->
+<div class="sticky top-14 z-30 bg-surface/95 backdrop-blur-md pt-space-lg pb-space-md -mx-margin px-margin">
+<div class="max-w-[1200px] mx-auto flex flex-col gap-space-md">
+<div class="flex items-end justify-between gap-space-md">
+<div class="flex flex-col gap-space-xs min-w-0">
+<div class="flex items-baseline gap-space-sm">
+<h1 class="font-display-lg text-display-lg text-on-surface">Today</h1>
+<span class="font-label-lg text-label-lg text-on-surface-variant">Tuesday, Oct 24</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">A few things worth making time for.</p>
+</div>
+<button class="inline-flex items-center gap-space-xs bg-primary-container text-on-primary px-space-md py-2.5 rounded-xl font-label-lg text-label-lg hover:bg-primary transition-colors shadow-sm shrink-0" id="add-habit-btn" type="button">
+<span class="material-symbols-outlined text-base">add</span>
+<span>Add habit</span>
+</button>
+</div>
+<!-- Daily Progress Summary Row -->
+<div class="flex items-center gap-space-md pt-space-xs">
+<span class="font-label-lg text-label-lg text-on-surface-variant tabular-nums shrink-0" id="progress-label">2 of 4 completed</span>
+<div class="w-full h-2 bg-secondary-fixed/50 rounded-full overflow-hidden">
+<div class="h-full bg-primary-container rounded-full transition-all duration-300 ease-out" id="progress-bar" style="width: 50%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Content Container -->
+<div class="max-w-[1200px] w-full mx-auto flex flex-col gap-space-lg pt-space-sm">
+<!-- Above-the-fold 2-Column Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch">
+<!-- Left ~2/3: Today's Habits Task Panel -->
+<section class="lg:col-span-8 bg-surface-container-lowest rounded-xl shadow-sm flex flex-col overflow-hidden">
+<div class="px-space-lg pt-space-lg pb-space-md flex items-center justify-between bg-surface-container-lowest">
+<div class="flex flex-col gap-0.5 min-w-0">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Today’s habits</h2>
+<p class="font-label-lg text-label-lg text-on-surface-variant">Daily routines scheduled for Tuesday</p>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant bg-surface-container px-2.5 py-1 rounded-full tabular-nums">4 routines</span>
+</div>
+<!-- Internally Scrollable List Container -->
+<div class="px-space-lg pb-space-lg flex flex-col gap-space-sm max-h-[340px] overflow-y-auto" id="habit-list">
+<!-- Habit Row 1 (Checked) -->
+<div class="habit-row group flex items-center justify-between gap-space-md p-space-md rounded-xl bg-surface-container-low/60 hover:bg-surface-container-low transition-colors" data-checked="true">
+<div class="flex items-center gap-space-md min-w-0">
+<button aria-label="Toggle Morning mobility &amp; stretch" class="habit-checkbox w-[22px] h-[22px] rounded-[6px] bg-primary-container text-on-primary flex items-center justify-center shrink-0 transition-colors" type="button">
+<span class="material-symbols-outlined text-sm">check</span>
+</button>
+<div class="flex flex-col min-w-0">
+<span class="habit-title font-body-lg text-body-lg font-medium text-on-surface-variant line-through truncate">Morning mobility &amp; stretch</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">07:00 AM · 15 min</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm shrink-0">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-tertiary-fixed/50 text-on-tertiary-fixed-variant font-label-md text-label-md tabular-nums">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+                14d
+              </span>
+<button aria-label="Habit options" class="p-1 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-lg">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Habit Row 2 (Checked) -->
+<div class="habit-row group flex items-center justify-between gap-space-md p-space-md rounded-xl bg-surface-container-low/60 hover:bg-surface-container-low transition-colors" data-checked="true">
+<div class="flex items-center gap-space-md min-w-0">
+<button aria-label="Toggle Deep work block" class="habit-checkbox w-[22px] h-[22px] rounded-[6px] bg-primary-container text-on-primary flex items-center justify-center shrink-0 transition-colors" type="button">
+<span class="material-symbols-outlined text-sm">check</span>
+</button>
+<div class="flex flex-col min-w-0">
+<span class="habit-title font-body-lg text-body-lg font-medium text-on-surface-variant line-through truncate">Deep work block</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">09:00 AM · 90 min</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm shrink-0">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-tertiary-fixed/50 text-on-tertiary-fixed-variant font-label-md text-label-md tabular-nums">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+                8d
+              </span>
+<button aria-label="Habit options" class="p-1 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-lg">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Habit Row 3 (Unchecked + At risk) -->
+<div class="habit-row group flex items-center justify-between gap-space-md p-space-md rounded-xl bg-surface-container-low/60 hover:bg-surface-container-low transition-colors" data-checked="false">
+<div class="flex items-center gap-space-md min-w-0">
+<button aria-label="Toggle Read 20 pages" class="habit-checkbox w-[22px] h-[22px] rounded-[6px] bg-surface-container-lowest shadow-sm flex items-center justify-center shrink-0 transition-colors" type="button">
+<span class="material-symbols-outlined text-sm hidden">check</span>
+</button>
+<div class="flex flex-col min-w-0">
+<span class="habit-title font-body-lg text-body-lg font-medium text-on-surface truncate">Read 20 pages</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">06:30 PM · 20 min</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm shrink-0">
+<span class="px-2 py-0.5 rounded-lg bg-tertiary-fixed/60 text-on-tertiary-fixed-variant font-label-md text-label-md">At risk</span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-tertiary-fixed/50 text-on-tertiary-fixed-variant font-label-md text-label-md tabular-nums">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+                21d
+              </span>
+<button aria-label="Habit options" class="p-1 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-lg">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Habit Row 4 (Unchecked) -->
+<div class="habit-row group flex items-center justify-between gap-space-md p-space-md rounded-xl bg-surface-container-low/60 hover:bg-surface-container-low transition-colors" data-checked="false">
+<div class="flex items-center gap-space-md min-w-0">
+<button aria-label="Toggle Evening wind-down" class="habit-checkbox w-[22px] h-[22px] rounded-[6px] bg-surface-container-lowest shadow-sm flex items-center justify-center shrink-0 transition-colors" type="button">
+<span class="material-symbols-outlined text-sm hidden">check</span>
+</button>
+<div class="flex flex-col min-w-0">
+<span class="habit-title font-body-lg text-body-lg font-medium text-on-surface truncate">Evening wind-down</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">09:30 PM · 15 min</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm shrink-0">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-tertiary-fixed/50 text-on-tertiary-fixed-variant font-label-md text-label-md tabular-nums">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+                5d
+              </span>
+<button aria-label="Habit options" class="p-1 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-lg">more_horiz</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Right ~1/3: Consistency & Account Column -->
+<div class="lg:col-span-4 flex flex-col gap-gutter">
+<!-- Featured Deep Forest-Green Consistency Card -->
+<section class="bg-primary-container text-on-primary rounded-xl p-space-lg shadow-sm flex flex-col justify-between gap-space-lg">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex flex-col gap-0.5">
+<span class="font-label-md text-label-md text-on-primary-container uppercase tracking-wider">Consistency</span>
+<h2 class="font-headline-sm text-headline-sm text-on-primary">Last 7 days</h2>
+</div>
+<span class="font-stat-lg text-stat-lg text-secondary-fixed tabular-nums">86%</span>
+</div>
+<!-- 7-Day Vertical Bars -->
+<div class="grid grid-cols-7 gap-space-sm items-end h-24 pt-space-sm">
+<div class="flex flex-col items-center gap-1.5 h-full justify-end">
+<div class="w-full max-w-[14px] bg-primary rounded-full h-full flex items-end overflow-hidden">
+<div class="w-full bg-secondary-fixed rounded-full" style="height: 100%;"></div>
+</div>
+<span class="font-label-md text-label-md text-on-primary-container">M</span>
+</div>
+<div class="flex flex-col items-center gap-1.5 h-full justify-end">
+<div class="w-full max-w-[14px] bg-primary rounded-full h-full flex items-end overflow-hidden">
+<div class="w-full bg-secondary-fixed rounded-full" style="height: 75%;"></div>
+</div>
+<span class="font-label-md text-label-md text-on-primary-container">T</span>
+</div>
+<div class="flex flex-col items-center gap-1.5 h-full justify-end">
+<div class="w-full max-w-[14px] bg-primary rounded-full h-full flex items-end overflow-hidden">
+<div class="w-full bg-secondary-fixed rounded-full" style="height: 100%;"></div>
+</div>
+<span class="font-label-md text-label-md text-on-primary-container">W</span>
+</div>
+<div class="flex flex-col items-center gap-1.5 h-full justify-end">
+<div class="w-full max-w-[14px] bg-primary rounded-full h-full flex items-end overflow-hidden">
+<div class="w-full bg-secondary-fixed rounded-full" style="height: 100%;"></div>
+</div>
+<span class="font-label-md text-label-md text-on-primary-container">T</span>
+</div>
+<div class="flex flex-col items-center gap-1.5 h-full justify-end">
+<div class="w-full max-w-[14px] bg-primary rounded-full h-full flex items-end overflow-hidden">
+<div class="w-full bg-secondary-fixed rounded-full" style="height: 50%;"></div>
+</div>
+<span class="font-label-md text-label-md text-on-primary-container">F</span>
+</div>
+<div class="flex flex-col items-center gap-1.5 h-full justify-end">
+<div class="w-full max-w-[14px] bg-primary rounded-full h-full flex items-end overflow-hidden">
+<div class="w-full bg-secondary-fixed rounded-full" style="height: 100%;"></div>
+</div>
+<span class="font-label-md text-label-md text-on-primary-container">S</span>
+</div>
+<div class="flex flex-col items-center gap-1.5 h-full justify-end">
+<div class="w-full max-w-[14px] bg-primary rounded-full h-full flex items-end overflow-hidden">
+<div class="w-full bg-secondary-fixed rounded-full" style="height: 75%;"></div>
+</div>
+<span class="font-label-md text-label-md text-on-primary">S</span>
+</div>
+</div>
+</section>
+<!-- Account & Privacy Panel -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Account &amp; privacy</h2>
+<span class="material-symbols-outlined text-lg text-secondary">verified_user</span>
+</div>
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between py-1">
+<span class="font-body-md text-body-md text-on-surface-variant">Local-first sync</span>
+<span class="font-label-md text-label-md text-secondary bg-secondary-fixed/50 px-2 py-0.5 rounded-lg">Active</span>
+</div>
+<div class="flex items-center justify-between py-1">
+<span class="font-body-md text-body-md text-on-surface-variant">Encrypted backup</span>
+<span class="font-label-md text-label-md text-on-surface-variant">2m ago</span>
+</div>
+</div>
+<a class="inline-flex items-center justify-between pt-space-xs font-label-lg text-label-lg text-primary-container hover:text-secondary transition-colors" href="#">
+<span>Manage data &amp; exports</span>
+<span class="material-symbols-outlined text-base">arrow_forward</span>
+</a>
+</section>
+</div>
+</div>
+<!-- Full-Width Annual Contribution Heatmap Card -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-lg">
+<div class="flex flex-wrap items-center justify-between gap-space-md">
+<div class="flex flex-col gap-0.5">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Annual contribution</h2>
+<p class="font-label-lg text-label-lg text-on-surface-variant">Daily check-in density across 52 weeks</p>
+</div>
+<div class="flex items-center gap-space-sm bg-surface-container px-3 py-1.5 rounded-lg">
+<span class="material-symbols-outlined text-base text-on-surface-variant">calendar_month</span>
+<select aria-label="Select year" class="bg-transparent font-label-lg text-label-lg text-on-surface focus:outline-none cursor-pointer" id="year-selector">
+<option selected="" value="2025">2025</option>
+<option value="2024">2024</option>
+</select>
+</div>
+</div>
+<!-- 4 Summary Stats -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-space-md">
+<div class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-0.5">
+<span class="font-label-md text-label-md text-on-surface-variant">Check-ins</span>
+<span class="font-stat-lg text-stat-lg text-on-surface tabular-nums">842</span>
+</div>
+<div class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-0.5">
+<span class="font-label-md text-label-md text-on-surface-variant">Active days</span>
+<span class="font-stat-lg text-stat-lg text-on-surface tabular-nums">264</span>
+</div>
+<div class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-0.5">
+<span class="font-label-md text-label-md text-on-surface-variant">Current streak</span>
+<span class="font-stat-lg text-stat-lg text-on-surface tabular-nums">14 days</span>
+</div>
+<div class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-0.5">
+<span class="font-label-md text-label-md text-on-surface-variant">Longest streak</span>
+<span class="font-stat-lg text-stat-lg text-on-surface tabular-nums">38 days</span>
+</div>
+</div>
+<!-- 52-Week Heatmap Grid -->
+<div class="flex flex-col gap-space-sm overflow-x-auto pb-1">
+<div class="grid grid-flow-col grid-rows-7 gap-[4px] w-max" id="heatmap-grid"></div>
+<div class="flex items-center justify-end gap-space-xs pt-space-xs">
+<span class="font-label-md text-label-md text-on-surface-variant mr-1">Less</span>
+<span class="w-3 h-3 rounded-[4px] bg-surface-container-high inline-block"></span>
+<span class="w-3 h-3 rounded-[4px] bg-secondary-fixed inline-block"></span>
+<span class="w-3 h-3 rounded-[4px] bg-secondary-fixed-dim inline-block"></span>
+<span class="w-3 h-3 rounded-[4px] bg-secondary inline-block"></span>
+<span class="w-3 h-3 rounded-[4px] bg-primary-container inline-block"></span>
+<span class="font-label-md text-label-md text-on-surface-variant ml-1">More</span>
+</div>
+</div>
+</section>
+</div>
+</div>
+<script>
+  (function () {
+    const habitRows = document.querySelectorAll('.habit-row');
+    const progressLabel = document.getElementById('progress-label');
+    const progressBar = document.getElementById('progress-bar');
+
+    function updateProgress() {
+      const total = habitRows.length;
+      let completed = 0;
+      habitRows.forEach((row) => {
+        if (row.getAttribute('data-checked') === 'true') completed++;
+      });
+      progressLabel.textContent = `${completed} of ${total} completed`;
+      progressBar.style.width = `${(completed / total) * 100}%`;
+    }
+
+    habitRows.forEach((row) => {
+      const checkbox = row.querySelector('.habit-checkbox');
+      const icon = checkbox.querySelector('.material-symbols-outlined');
+      const title = row.querySelector('.habit-title');
+
+      checkbox.addEventListener('click', () => {
+        const isChecked = row.getAttribute('data-checked') === 'true';
+        const nextState = !isChecked;
+        row.setAttribute('data-checked', String(nextState));
+
+        if (nextState) {
+          checkbox.classList.remove('bg-surface-container-lowest', 'shadow-sm');
+          checkbox.classList.add('bg-primary-container', 'text-on-primary');
+          icon.classList.remove('hidden');
+          title.classList.add('text-on-surface-variant', 'line-through');
+          title.classList.remove('text-on-surface');
+        } else {
+          checkbox.classList.add('bg-surface-container-lowest', 'shadow-sm');
+          checkbox.classList.remove('bg-primary-container', 'text-on-primary');
+          icon.classList.add('hidden');
+          title.classList.remove('text-on-surface-variant', 'line-through');
+          title.classList.add('text-on-surface');
+        }
+        updateProgress();
+      });
+    });
+
+    const heatmapGrid = document.getElementById('heatmap-grid');
+    const levels = [
+      'bg-surface-container-high',
+      'bg-secondary-fixed',
+      'bg-secondary-fixed-dim',
+      'bg-secondary',
+      'bg-primary-container'
+    ];
+
+    function renderHeatmap(seedOffset) {
+      heatmapGrid.innerHTML = '';
+      const totalCells = 52 * 7;
+      for (let i = 0; i < totalCells; i++) {
+        const cell = document.createElement('div');
+        const pseudo = Math.abs(Math.sin((i + 1 + seedOffset) * 12.9898) * 43758.5453) % 1;
+        let levelIdx = 0;
+        if (pseudo > 0.85) levelIdx = 4;
+        else if (pseudo > 0.65) levelIdx = 3;
+        else if (pseudo > 0.45) levelIdx = 2;
+        else if (pseudo > 0.25) levelIdx = 1;
+
+        cell.className = `w-3 h-3 rounded-[4px] ${levels[levelIdx]} transition-opacity hover:opacity-80`;
+        cell.title = `${levelIdx} check-ins`;
+        heatmapGrid.appendChild(cell);
+      }
+    }
+
+    renderHeatmap(0);
+
+    const yearSelector = document.getElementById('year-selector');
+    yearSelector.addEventListener('change', (e) => {
+      renderHeatmap(e.target.value === '2024' ? 100 : 0);
+    });
+  })();
+</script></main></div></body></html>

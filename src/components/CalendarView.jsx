@@ -1,155 +1,202 @@
 import { useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { isEligibleDay, parseDateKey, toDateKey } from '../utils/insights';
+import './SupportingPages.css';
 
-function CalendarView({ completions, habits }) {
-  const [currentDate, setCurrentDate] = useState(new Date());
-
-  const getDaysInMonth = (date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-    const startingDayOfWeek = firstDay.getDay();
-
-    const days = [];
-
-    // Add empty cells for days before the first day of the month
-    for (let i = 0; i < startingDayOfWeek; i++) {
-      days.push(null);
+function CalendarView({ completions, habits, today = toDateKey() }) {
+  const [month, setMonth] = useState(() => today.slice(0, 7));
+  const [selected, setSelected] = useState(today);
+  const monthDate = parseDateKey(`${month}-01`);
+  const monthLabel = monthDate.toLocaleDateString(undefined, {
+    month: 'long',
+    year: 'numeric',
+  });
+  const daysInMonth = new Date(
+    monthDate.getFullYear(),
+    monthDate.getMonth() + 1,
+    0
+  ).getDate();
+  const offset = (monthDate.getDay() + 6) % 7;
+  const cells = Array.from(
+    { length: Math.ceil((offset + daysInMonth) / 7) * 7 },
+    (_, index) => {
+      const day = index - offset + 1;
+      return day < 1 || day > daysInMonth
+        ? null
+        : `${month}-${String(day).padStart(2, '0')}`;
     }
-
-    // Add days of the month
-    for (let day = 1; day <= daysInMonth; day++) {
-      days.push(new Date(year, month, day));
-    }
-
-    return days;
+  );
+  const dayData = Object.fromEntries(
+    cells.filter(Boolean).map((date) => {
+      const due = habits.filter((habit) => isEligibleDay(habit, date, today));
+      const completed = due.filter((habit) =>
+        (completions[habit.id] || []).includes(date)
+      ).length;
+      return [date, { due: due.length, completed }];
+    })
+  );
+  const selectedHabits = habits.filter((habit) =>
+    isEligibleDay(habit, selected, today)
+  );
+  const selectedCompleted = selectedHabits.filter((habit) =>
+    (completions[habit.id] || []).includes(selected)
+  ).length;
+  const navigate = (direction) => {
+    const next = new Date(
+      monthDate.getFullYear(),
+      monthDate.getMonth() + direction,
+      1
+    );
+    const key = toDateKey(next);
+    setMonth(key.slice(0, 7));
+    setSelected(key);
   };
-
-  const getCompletionStatus = (date) => {
-    if (!date) return null;
-
-    const dateStr = date.toISOString().split('T')[0];
-    const totalHabits = habits.length;
-    const completedHabits = habits.filter(habit =>
-      (completions[habit.id] || []).includes(dateStr)
-    ).length;
-
-    if (completedHabits === 0) return 'none';
-    if (completedHabits === totalHabits) return 'full';
-    return 'partial';
+  const goToday = () => {
+    setMonth(today.slice(0, 7));
+    setSelected(today);
   };
-
-  const navigateMonth = (direction) => {
-    setCurrentDate(prevDate => {
-      const newDate = new Date(prevDate);
-      newDate.setMonth(newDate.getMonth() + direction);
-      return newDate;
-    });
-  };
-
-  const goToToday = () => {
-    setCurrentDate(new Date());
-  };
-
-  const days = getDaysInMonth(currentDate);
-  const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
 
   return (
-    <div className="mb-6 p-6 bg-white rounded-xl shadow-lg border border-gray-100">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center">
-          <div className="text-2xl mr-3">📅</div>
-          <h2 className="text-2xl font-semibold text-gray-800">Calendar View</h2>
-        </div>
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => navigateMonth(-1)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-          >
-            ←
-          </button>
-          <button
-            onClick={goToToday}
-            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200 text-sm"
-          >
-            Today
-          </button>
-          <button
-            onClick={() => navigateMonth(1)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-          >
-            →
-          </button>
-        </div>
-      </div>
-
-      <div className="mb-4 text-center">
-        <h3 className="text-xl font-semibold text-gray-700">
-          {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-        </h3>
-      </div>
-
-      {/* Calendar Grid */}
-      <div className="grid grid-cols-7 gap-1 mb-4">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-          <div key={day} className="p-2 text-center text-sm font-medium text-gray-500">
-            {day}
-          </div>
-        ))}
-
-        {days.map((date, index) => {
-          const status = getCompletionStatus(date);
-          const isToday = date && date.toDateString() === new Date().toDateString();
-
-          return (
-            <div
-              key={index}
-              className={`aspect-square p-1 flex items-center justify-center text-sm relative ${
-                date ? 'cursor-pointer hover:bg-gray-50' : ''
-              }`}
+    <div className="calendar-layout">
+      <section
+        className="panel calendar-panel"
+        aria-label="Completion calendar"
+      >
+        <div className="calendar-heading">
+          <h2 className="section-title" aria-live="polite">
+            {monthLabel}
+          </h2>
+          <div className="calendar-controls">
+            <button
+              className="btn btn-secondary calendar-nav-btn"
+              aria-label="Previous month"
+              onClick={() => navigate(-1)}
             >
-              {date && (
-                <>
-                  <span className={`font-medium ${isToday ? 'text-blue-600 font-bold' : 'text-gray-700'}`}>
-                    {date.getDate()}
-                  </span>
-                  {status && (
-                    <div
-                      className={`absolute bottom-1 right-1 w-2 h-2 rounded-full ${
-                        status === 'full' ? 'bg-green-500' :
-                        status === 'partial' ? 'bg-yellow-500' : 'bg-gray-300'
-                      }`}
-                    />
-                  )}
-                  {isToday && (
-                    <div className="absolute inset-0 border-2 border-blue-500 rounded-lg" />
-                  )}
-                </>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Legend */}
-      <div className="flex items-center justify-center space-x-6 text-sm">
-        <div className="flex items-center">
-          <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-          <span>All habits completed</span>
+              <ChevronLeft size={18} aria-hidden="true" />
+            </button>
+            <button className="btn btn-secondary" onClick={goToday}>
+              Today
+            </button>
+            <button
+              className="btn btn-secondary calendar-nav-btn"
+              aria-label="Next month"
+              onClick={() => navigate(1)}
+              disabled={month >= today.slice(0, 7)}
+            >
+              <ChevronRight size={18} aria-hidden="true" />
+            </button>
+          </div>
         </div>
-        <div className="flex items-center">
-          <div className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
-          <span>Some habits completed</span>
+        <table className="calendar-grid">
+          <caption className="visually-hidden">
+            {monthLabel}. Select a day to view its habits.
+          </caption>
+          <thead>
+            <tr>
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+                <th key={day} scope="col">
+                  {day}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: cells.length / 7 }, (_, row) => (
+              <tr key={row}>
+                {cells.slice(row * 7, row * 7 + 7).map((date, index) => {
+                  if (!date) return <td key={`blank-${index}`} />;
+                  const { due, completed } = dayData[date];
+                  const status =
+                    due === 0
+                      ? 'not-due'
+                      : completed === due
+                        ? 'complete'
+                        : completed > 0
+                          ? 'partial'
+                          : 'none';
+                  const label = `${parseDateKey(date).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}, ${date > today ? 'future date' : due ? `${completed} of ${due} completed` : 'no habits due'}`;
+                  return (
+                    <td key={date}>
+                      <button
+                        className={`calendar-day calendar-day-${status}`}
+                        aria-label={label}
+                        aria-pressed={selected === date}
+                        aria-current={date === today ? 'date' : undefined}
+                        disabled={date > today}
+                        onClick={() => setSelected(date)}
+                      >
+                        <span>{Number(date.slice(-2))}</span>
+                        {due > 0 && (
+                          <span
+                            className={`calendar-mark calendar-mark-${status}`}
+                            aria-hidden="true"
+                          />
+                        )}
+                      </button>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="calendar-legend">
+          <span>
+            <i className="calendar-mark-complete" />
+            All completed
+          </span>
+          <span>
+            <i className="calendar-mark-partial" />
+            Some completed
+          </span>
+          <span>
+            <i className="calendar-mark-none" />
+            None completed
+          </span>
         </div>
-        <div className="flex items-center">
-          <div className="w-3 h-3 bg-gray-300 rounded-full mr-2"></div>
-          <span>No habits completed</span>
+        <p className="muted calendar-footnote">
+          Only habits due on each date are counted. Future dates are excluded.
+        </p>
+      </section>
+      <section className="panel calendar-details" aria-live="polite">
+        <div className="section-copy">
+          <p className="muted">Selected day</p>
+          <h2 className="section-title">
+            {parseDateKey(selected).toLocaleDateString(undefined, {
+              weekday: 'long',
+              month: 'short',
+              day: 'numeric',
+            })}
+          </h2>
+          <p className="muted">
+            {selectedHabits.length
+              ? `${selectedCompleted} of ${selectedHabits.length} habits completed`
+              : 'No habits due on this day.'}
+          </p>
         </div>
-      </div>
+        <ul className="calendar-habit-list" aria-label="Habits for the selected date" tabIndex={0}>
+          {selectedHabits.map((habit) => {
+            const complete = (completions[habit.id] || []).includes(selected);
+            return (
+              <li key={habit.id}>
+                <span
+                  className={`completion-dot ${complete ? 'is-complete' : ''}`}
+                  aria-hidden="true"
+                >
+                  {complete ? '✓' : '–'}
+                </span>
+                <span>{habit.name}</span>
+                <span className="visually-hidden">
+                  {complete ? 'Completed' : 'Not completed'}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+        {habits.length === 0 && (
+          <p className="muted">Add a habit to start recording your calendar.</p>
+        )}
+      </section>
     </div>
   );
 }
