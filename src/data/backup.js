@@ -1,4 +1,4 @@
-// Backups retain the existing localStorage schema and any extra habit metadata.
+// Validate a downloaded Habit Tracker backup before importing it to the account.
 function validDateKey(value) {
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value))
     return false;

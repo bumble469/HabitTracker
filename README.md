@@ -1,6 +1,6 @@
 # Habit Tracker: Behaviour Insights & AI Coach
 
-A browser-local habit workspace built with React and Vite. Track daily routines, review completion history, and calculate behaviour insights without a backend. Optional prediction requests are controlled by an AI preference that starts off.
+A habit workspace built with React and Vite. Plan daily routines, save check-ins to your account, and understand your consistency through activity calendars, streaks, and optional AI predictions.
 
 [Published project demo](https://theunknown550.github.io/Habit-Tracker-Web-App/) · [Installation guide](INSTALLATION.md) · [Frontend implementation handoff](FRONTEND_HANDOFF.md)
 
@@ -8,17 +8,22 @@ The published demo may differ from the branch you run locally. The Coach is a fu
 
 ## Features and navigation
 
-Desktop uses a labeled sidebar; smaller screens use a modal navigation drawer. The existing state-based tabs remain in place, with Dashboard added as the daily starting point.
+The home URL always opens a public project introduction, with feature explanations, interface illustrations, a captioned video walkthrough, and FAQs. It does not show invented account totals or load personal activity. **Get started** opens `/app` with Log in and Sign up available. Successful login or registration always opens the normal workspace at `/app`; logout returns to the landing page. Desktop uses a labeled sidebar; smaller screens use a modal navigation drawer. The workspace fits the viewport: headings and controls stay visible, page content scrolls inside its pane, and My Habits has an independently scrollable list with a fixed header.
 
 | Tab | Purpose |
 | --- | --- |
-| Dashboard | Today’s due habits, check-ins, progress, streaks, badges, and a seven-day summary. |
-| Habits | Create, edit, check in, and confirm deletion of habits and their history. |
-| Calendar | Browse months and select a day to inspect its eligible habits and completions. |
+| Overview | Four account-derived summary tiles, today’s completion ring and habits, a seven-day summary, and annual activity. |
+| My habits | Create, edit, check in, and confirm deletion of habits and their history. |
+| Activity | Annual contribution calendar plus monthly history and per-day habit details. |
 | Statistics | Habit totals, active habits, current streaks, monthly completion, top habits, and the last 14 days. |
 | Insights | Weekly consistency, weekday completion, per-habit drop-off comparisons, and optional ranked risk predictions for tomorrow. |
-| Data | Export JSON backups, validate and confirm import, or confirm clearing local habit data. |
-| Settings | Control AI sharing, manage backups, and explicitly load synthetic demo history. |
+| Settings | Control optional AI predictions and browser notifications. |
+
+Backup import, export, and clear-data tools are hidden from navigation and Settings. To use them for testing, sign in normally, then deliberately open `/pratik`. It is never the automatic post-login destination. On the existing GitHub Pages deployment, this is `/Habit-Tracker-Web-App/pratik/`. The production build includes physical `/app/` and `/pratik/` entries so these links work without a server-side routing fallback.
+
+The sign-up form requires at least 8 characters, a capital letter, a number, and a symbol. A live checklist shows each requirement, and invalid registration passwords are rejected before an API request. Existing account login passwords remain accepted. These are frontend form checks; the authentication API and backend code are unchanged.
+
+The activity calendar uses neutral squares for days with no check-ins and progressively deeper green for 1, 2, 3, and 4 or more completions. Check-in totals and active days refer to the selected year; current and longest streaks span all saved history. An active day requires at least one completed habit. Streaks count consecutive calendar days, and an unfinished today keeps a streak through yesterday. Dates follow the account timezone.
 
 Habit opportunities respect creation dates and imported weekday schedules. Charts exclude future dates and show eligible opportunities as their denominator. Insights includes accessible data tables and a working 4/8/12-calendar-week selector. The current week ends today. Drop-off comparisons use two fixed 14-day windows and show an insufficient-history state when a comparison is not supported.
 
@@ -28,9 +33,9 @@ Habit opportunities respect creation dates and imported weekday schedules. Chart
 - Vite 7 and npm, with `package-lock.json` retained.
 - Tailwind CSS 4 and shared semantic CSS tokens.
 - Recharts 3.11 for analytical charts.
-- Lucide React icons and locally bundled IBM Plex Sans, with a system-font fallback.
+- Lucide React icons and locally bundled Inter, with system-font fallbacks.
 - Vitest and jsdom for calculation, request-layer, hook, and interaction tests.
-- Browser `localStorage` as the source of truth. No database or backend is required for local features.
+- Account-backed habit and completion APIs, with browser session storage for sign-in.
 
 ## Local development
 
@@ -69,13 +74,13 @@ AI starts **off** and its preference persists separately from habit data. With A
 
 Missing configuration, timeouts, invalid responses, and a backend outage produce explicit unavailable states and a retry action when enabled. Check-ins, calendar, statistics, local charts, and backups remain usable. A FastAPI implementation and live contract verification are not included in this repository; see the [handoff](FRONTEND_HANDOFF.md) for questions for the backend owner.
 
-## Local data and demo history
+## Account data and the landing-page example
 
-The original storage keys remain `habits`, `completions`, and `aiEnabled`. Completion history is an object keyed by habit ID, with local `YYYY-MM-DD` date arrays. Data is scoped to this browser and origin; export a JSON backup before clearing browser storage or switching origins.
+Habits and check-ins are loaded from the signed-in account. Completion history is an object keyed by habit ID, with `YYYY-MM-DD` date arrays. Browser-local legacy habit data is not used as account history.
 
-**Load demo data** in Settings creates six explicitly synthetic habits with deterministic 84-day history. It is never loaded automatically. Existing data is replaced only after confirmation. Import and clear actions also require confirmation; all preserve the separate AI preference. Export remains available before replacement.
+The landing page does not display a sample personal dashboard or synthetic activity totals. It explains the real workflow using original SVG interface illustrations and a 24-second animated product walkthrough, explicitly labeled as illustrations with no account data. This is authored media, not a browser recording or screenshots of an account. The walkthrough has native video controls, English captions, a transcript, and no autoplay. Rebuild the media with `python3 scripts/build-landing-media.py` (requires FFmpeg with librsvg and libx264). Real accounts start with their own habits. Account backups remain available only through the hidden `/pratik` route; import and clear actions retain their confirmation dialogs.
 
-Core features need no backend or API connection after the app has loaded. The project does not include a service worker for offline launch or reload; its static assets still need to be available.
+The public landing page needs no backend connection. Sign-in, account tracking, notifications, and predictions require their configured services. The notification service worker is not an offline application cache.
 
 ## Project structure
 

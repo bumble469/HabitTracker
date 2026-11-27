@@ -126,9 +126,8 @@ Final full-suite totals, lint/build results, and browser evidence are recorded b
 | REQ-07 offline operation | CRUD, check-ins, calendar, statistics, backups, and local Insights work without the backend. Static assets still need to load. |
 | REQ-08 AI toggle/privacy | Persisted off-by-default preference, shared request gate, cancellation and no queued/retry/health requests while off. |
 | REQ-11 Insights performance | Reusable pure aggregations; measured local year-of-history computation separately from API latency. |
-| REQ-09 / REQ-10 Coach | Deferred. No Coach UI or contract-backed conversation flow is claimed. |
 
-This mapping covers frontend implementation and its tests. It does not claim backend validation, model evaluation, training-data work, retrieval quality, or prediction accuracy.
+This mapping covers frontend implementation and its tests. It does not claim backend validation, model evaluation, training-data work, or prediction accuracy.
 
 ## 10. API dependencies and questions for Alisher
 
@@ -156,7 +155,6 @@ Please confirm:
 - How weekday schedules are represented. Existing local/imported `scheduledDays` or `days` arrays are respected locally, but the draft prediction payload contains no schedule field. No backend contract was silently expanded.
 - The intended handling of today’s still-open opportunity and the backend timezone assumption.
 - Public backend URL, HTTPS availability, CORS origins, and any authentication requirements. No authentication scheme was invented in the frontend.
-- A verified `/coach` request/response schema, including `habit_summary`, `sources`, off-topic declines, and error/insufficient-data responses, before Coach work starts.
 
 No backend, model, database, training-data, or endpoint code was changed. Test responses remain confined to tests; demo history never produces fabricated production predictions.
 
@@ -166,9 +164,8 @@ Existing Settings, Insights/drop-off, demo-data, prediction, and test-related wo
 
 Hemant can review the adjacent tests and coordinate additional assistive-technology and browser coverage beyond the Chrome/axe checks recorded above. Documentation should use the corrected eligible-opportunity definitions, distinguish live backend integration from mocked request tests, and keep synthetic frontend demos separate from Alisher’s training data. Existing contributed `INSTALLATION.md` remains linked; its older Node/yarn instructions should be reconciled with the current npm/Node guidance when documentation is coordinated.
 
-## 12. Remaining limitations and Coach status
+## 12. Remaining limitations
 
-- **Coach is deferred.** There is no verified `habit_summary`/`sources` contract or working conversation UI, and no direct browser model-provider call.
 - Live prediction behavior, CORS, model accuracy, and backend insufficient-history responses need Alisher’s running service and schema agreement.
 - A schedule-aware prediction payload requires an agreed contract. Existing imported schedules work locally; the concise create/edit form currently creates daily habits and edits name/description.
 - localStorage is browser/origin-specific, has finite capacity, and is not a server backup. Export is available; storage failures show feedback.

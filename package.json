@@ -11,7 +11,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/host-grotesk": "^5.3.0",
     "@fontsource/ibm-plex-sans": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
     "@tailwindcss/vite": "^4.1.14",
     "lucide-react": "^1.77.0",
     "react": "^19.1.1",

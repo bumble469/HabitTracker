@@ -1,29 +1,23 @@
 import { useEffect, useState } from 'react';
-import { toDateKey } from '../utils/insights';
+import { dateKeyInTimezone } from '../utils/dates';
 
-export default function useLocalDate() {
-  const [today, setToday] = useState(() => toDateKey());
+export default function useLocalDate(timezone = 'UTC') {
+  const [today, setToday] = useState(() => dateKeyInTimezone(new Date(), timezone));
   useEffect(() => {
-    let timer;
     const refresh = () => {
-      setToday(toDateKey());
-      clearTimeout(timer);
-      const now = new Date();
-      const midnight = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate() + 1
-      );
-      timer = setTimeout(refresh, midnight.getTime() - now.getTime() + 25);
+      setToday(dateKeyInTimezone(new Date(), timezone));
     };
     refresh();
+    // A short interval also handles account midnight and daylight saving
+    // changes without calculating offsets from the browser's timezone.
+    const timer = setInterval(refresh, 30_000);
     window.addEventListener('focus', refresh);
     document.addEventListener('visibilitychange', refresh);
     return () => {
-      clearTimeout(timer);
+      clearInterval(timer);
       window.removeEventListener('focus', refresh);
       document.removeEventListener('visibilitychange', refresh);
     };
-  }, []);
+  }, [timezone]);
   return today;
 }

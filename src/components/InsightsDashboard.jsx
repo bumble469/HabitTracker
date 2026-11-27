@@ -21,6 +21,7 @@ import {
 } from '../utils/insights';
 import RiskBadge from './RiskBadge';
 import './InsightsDashboard.css';
+import SquareChartDot from './SquareChartDot';
 
 const formatDate = (key) =>
   parseDateKey(key).toLocaleDateString('en', {
@@ -30,7 +31,11 @@ const formatDate = (key) =>
   });
 const formatRate = (rate) =>
   rate === null ? 'No opportunities' : `${Math.round(rate * 100)}%`;
-const axis = { fill: '#5F6B64', fontSize: 12 };
+const axis = {
+  fill: '#687365',
+  fontSize: 11,
+  fontFamily: 'var(--font-mono, "Courier New", monospace)',
+};
 
 function OpportunityTooltip({ active, payload }) {
   const entry = payload?.[0]?.payload;
@@ -59,7 +64,7 @@ function ChartData({ data, weekly = false }) {
   return (
     <details className="chart-data">
       <summary>View chart data</summary>
-      <div className="chart-table-wrap">
+      <div className="chart-table-wrap" role="region" aria-label="Chart data" tabIndex={0}>
         <table>
           <caption className="sr-only">
             {weekly ? 'Weekly consistency' : 'Weekday completion'}: completed
@@ -127,10 +132,9 @@ function InsightsDashboard({
         <div className="empty-symbol" aria-hidden="true">
           ↗
         </div>
-        <h2>Your local report starts here</h2>
+        <h2>Your report starts here</h2>
         <p className="muted">
-          Add a habit to track consistency, or load synthetic demo history in
-          Settings to explore the report.
+          Add a habit to track your consistency and progress over time.
         </p>
         <p className="muted">
           Charts and drop-off summaries work with AI disabled.
@@ -143,7 +147,7 @@ function InsightsDashboard({
       <div className="insights-report-intro">
         <div>
           <p className="muted">
-            Understand your patterns with data stored on this device.
+            Understand patterns in your account habit history.
           </p>
           <p className="report-period">
             {formatDate(insights.period.startKey)} – {formatDate(today)}
@@ -193,7 +197,7 @@ function InsightsDashboard({
                 margin={{ top: 12, right: 16, bottom: 8, left: -10 }}
                 accessibilityLayer
               >
-                <CartesianGrid vertical={false} stroke="#E7ECE8" />
+                <CartesianGrid vertical={false} stroke="#edf1e7" />
                 <XAxis
                   dataKey="week"
                   axisLine={false}
@@ -216,10 +220,10 @@ function InsightsDashboard({
                   name="Completion"
                   type="linear"
                   dataKey="rate"
-                  stroke="#285A46"
-                  strokeWidth={2.5}
-                  dot={{ r: 3.5, fill: '#FFFFFF', strokeWidth: 2 }}
-                  activeDot={{ r: 5 }}
+                  stroke="#244b3d"
+                  strokeWidth={1.5}
+                  dot={<SquareChartDot />}
+                  activeDot={false}
                   connectNulls={false}
                   isAnimationActive={false}
                 />
@@ -253,7 +257,7 @@ function InsightsDashboard({
                 margin={{ top: 12, right: 8, bottom: 8, left: -10 }}
                 accessibilityLayer
               >
-                <CartesianGrid vertical={false} stroke="#E7ECE8" />
+                <CartesianGrid vertical={false} stroke="#edf1e7" />
                 <XAxis
                   dataKey="day"
                   axisLine={false}
@@ -273,13 +277,13 @@ function InsightsDashboard({
                 />
                 <Tooltip
                   content={<OpportunityTooltip />}
-                  cursor={{ fill: '#F0F4F1' }}
+                  cursor={{ fill: '#edf1e7' }}
                 />
                 <Bar
                   name="Completion"
                   dataKey="rate"
-                  fill="#527A63"
-                  radius={[3, 3, 0, 0]}
+                  fill="#244b3d"
+                  radius={[4, 4, 0, 0]}
                   maxBarSize={32}
                   isAnimationActive={false}
                 />
@@ -303,7 +307,9 @@ function InsightsDashboard({
       <section className="panel insights-risk">
         <div className="insights-section-heading">
           <div>
-            <h2 className="section-title">Chance of missing tomorrow</h2>
+            <h2 className="section-title">
+              Estimated chance of missing the next three days
+            </h2>
             <p className="muted">
               For {formatDate(addDays(today, 1))}. Predictions are independent
               of the reporting period above.
@@ -336,21 +342,21 @@ function InsightsDashboard({
           <>
             <p className="status-note" role="status">
               {predictionLoading
-                ? 'Loading predictions for tomorrow. Your local report is available.'
+                ? 'Loading backend risk estimates.'
                 : predictionError
-                  ? `${predictionError} Your local report is available.`
-                  : 'Ranked by chance of missing tomorrow. Equal probabilities retain habit order.'}
+                  ? `${predictionError} Your account history is still available.`
+                  : 'Ranked by risk estimate for the next three days.'}
             </p>
             {rankedHabits.length > 0 && (
               <table className="risk-table">
                 <caption className="sr-only">
-                  Habits ranked by backend probability of missing tomorrow.
+                  Habits ranked by backend risk estimate.
                   Equal probabilities retain habit order.
                 </caption>
                 <thead>
                   <tr>
                     <th scope="col">Habit</th>
-                    <th scope="col">Chance of missing tomorrow</th>
+                    <th scope="col">Three-day risk</th>
                     <th scope="col">Risk level</th>
                     <th scope="col">Reason</th>
                   </tr>
@@ -364,7 +370,7 @@ function InsightsDashboard({
                           {habit.name}
                         </th>
                         <td
-                          data-label="Chance of missing tomorrow"
+                          data-label="Three-day risk"
                           className="probability-value"
                         >
                           {formatProbability(prediction.probability)}
@@ -387,6 +393,7 @@ function InsightsDashboard({
               <div
                 className="unranked-list"
                 aria-label="Habits without a ranked prediction"
+                tabIndex={0}
               >
                 {unrankedHabits.map((habit) => (
                   <div className="unranked-row" key={habit.id}>
