@@ -259,3 +259,29 @@
   .app-shell .dashboard-primary .progress-visual { flex-basis: 84px; width: 84px; }
   .app-shell .progress-ring { width: 84px; height: 84px; }
 }
+
+/* Habits page: the page itself scrolls, not the list. The list is paginated (10 per page) in HabitList.jsx. */
+.app-shell .page-content-habits { display: block; overflow-y: auto; overflow-x: hidden; padding-bottom: 24px; }
+.app-shell .page-content-habits .habit-management-panel { flex: none; min-height: auto; }
+.app-shell .page-content-habits .habit-management-panel .habit-list-scroll { flex: none; max-height: none; overflow: visible; }
+.app-shell .habit-pagination { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 20px; padding: 14px 24px 18px; border-top: 1px solid #eeece5; }
+.app-shell .habit-pagination-summary { color: #6c7669; font-size: 12px; }
+.app-shell .habit-pagination-controls { display: flex; align-items: center; gap: 12px; }
+.app-shell .habit-pagination-page { min-width: 92px; color: #4b5a47; font-size: 13px; font-variant-numeric: tabular-nums; text-align: center; }
+.app-shell .habit-pagination .btn { min-height: 38px; padding: 7px 13px; }
+@media (max-width: 680px) {
+  .app-shell .habit-pagination { justify-content: center; padding: 14px 12px 16px; }
+  .app-shell .habit-pagination-summary { width: 100%; text-align: center; }
+}
+
+/* Header actions (refresh + add) and a slim risk-estimate status line. */
+.app-shell .page-actions { display: flex; align-items: center; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.app-shell .page-actions .btn { white-space: nowrap; }
+.app-shell .spin-icon { animation: spin 800ms linear infinite; }
+.habit-form .settings-row .field-label, .habit-form .settings-row .form-hint { display: block; }
+.habit-form .settings-row .form-hint { margin-top: 2px; line-height: 1.5; }
+.app-shell .prediction-notice { display: block; padding: 7px 12px; margin-bottom: 14px; border-radius: 8px; font-size: 12px; line-height: 1.5; }
+@media (max-width: 680px) {
+  .app-shell .page-heading:has(.page-actions) { flex-wrap: wrap; }
+  .app-shell .page-actions { width: 100%; justify-content: flex-start; }
+}
